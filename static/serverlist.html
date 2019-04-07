@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Server List</title>
+    <link rel="stylesheet" href="css/serverlist.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="serverlist.js"></script>
+</head>
+<body>
+<div class="main-page">
+    <nav class="top-bar">
+        <button class="top-buttons" onclick="refreshGameList()">Refresh</button>
+        <button class="top-buttons" onclick="createGame()">Create</button>
+
+        <button class="top-buttons right" onclick="logOut()">Log out</button>
+    </nav>
+    <div class="openGamesContainer" id="openGamesContainer">
+        <!--<div class="openGame">
+            <div class="gameInfo">
+                <h3 class="gameTitle">Open Game</h3>
+                <p class="gameCreator infoChunk"><b>Creator:</b> noodleWrecker7</p>
+                <p class="playersInGame infoChunk"><b>Players:</b> 2/9</p>
+            </div>
+            <div class="gameButtons">
+                <button class="indButton">Join Game</button>
+            </div>
+        </div>-->
+
+
+
+    </div>
+</div>
+
+</body>
+</html>

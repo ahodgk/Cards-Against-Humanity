@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="client.js"></script>
+    <link rel="stylesheet" href="game.css">
+</head>
+<body>
+
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <span class="close" id="close-modal">&times;</span>
+        <p>Some text in das modal</p>
+    </div>
+</div>
+
+<div class="main-page">
+    <nav class="top-bar" id="top-bar">
+        <button class="top-buttons" onclick="">Leave</button>
+        <button class="top-buttons" onclick="">Start Game</button>
+
+        <div class="push-right"></div>
+
+        <button class="top-buttons" onclick="showGameConfig();">Game Config</button>
+        <button class="top-buttons right" onclick="logOut()">Log out</button>
+    </nav>
+    <div class="main-content">
+        <div class="main-game">
+            <div class="top-section">
+                <div class="black-card-section">
+                    <div class="black-card"></div>
+                    <button class="confirm-card-choice">Confirm Selection</button>
+                </div>
+                <div class="other-player-cards-section">
+                    <div class="other-card"><p class="white-card-text">This is a white card it should be a shorter
+                        message.</p>
+                    </div>
+                    <div class="other-card"></div>
+                    <div class="other-card"></div>
+                    <div class="other-card"></div>
+                    <div class="other-card"></div>
+                    <div class="other-card"></div>
+                    <div class="other-card"></div>
+                    <div class="other-card"></div>
+                    <div class="other-card"></div>
+                    <!--<div class="other-card"></div>
+                    <div class="other-card-ghost"></div>
+                    <div class="other-card-ghost"></div>
+                    <div class="other-card-ghost"></div>
+                    <div class="other-card-ghost"></div>
+                    <div class="other-card-ghost"></div>
+                    <div class="other-card-ghost"></div>-->
+
+
+                </div>
+            </div>
+            <div class="bottom-section">
+                <div class="player-list">
+                    <h4 class="players-title">Players:</h4>
+                    <div class="list-players" id="list-of-players">
+                        <div class="player-list-item"><p class="player-list-name">Player</p>
+                            <p class="player-list-points">0</p></div>
+                    </div>
+                </div>
+                <div class="bottom-card-container">
+                    <h4 class="bottom-card-container-title">Your Cards:</h4>
+                    <div class="cards-container">
+                        <div class="card"></div>
+                        <div class="card"></div>
+                        <div class="card"></div>
+                        <div class="card"></div>
+                        <div class="card"></div>
+                        <div class="card"></div>
+                        <div class="card"></div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chat-box" id="chat-box">
+            <!--<p class="chat-message">[12:13:37] This is a test message</p>
+            <p class="chat-message">[12:13:37] This is another test message</p>
+            <p class="chat-message">[15:32:56] At a different time this message is</p>-->
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
