@@ -28,6 +28,10 @@ socket.on('logged out', function () {
     window.location.href = "../";
 })
 
+socket.on('game left', function () {
+    window.location.href = "../static/serverlist.html";
+})
+
 socket.on('session not found', function () {
     setCookie("currentSessionID", "", 0.2);
     window.location.href = "../";
@@ -43,32 +47,122 @@ socket.on('game is full', function () {
 
 socket.on('receive full game state', function (data) {
     gameState = data;
-    console.log(data)
+    console.log(gameState)
     updatePlayersList();
+    if (creatorOptionsAdded) {
+        insertModalContent();
+        return;
+    }
+    if (isCreator) {
+        addCreatorOptions();
+    }
+})
 
+socket.on('receive cards', function (data) {
+    cardsData = data;
+    updateBottomCards();
 })
 
 socket.on('player list update', function (playerlist) {
 
 })
-
+var isCreator = false;
 socket.on('is creator', function () {
     addCreatorOptions();
+    isCreator = true;
 })
 
+function updateBottomCards() {
+    let text = "";
+    for (var i = 0; i < cardsData.length; i++) {
+        text += '<div id="card-' + i + '" class="card"><p class="white-card-text">' + cardsData[i].cardText + '</p></div>';
+    }
+    document.getElementById("cards-container").innerHTML = text;
+}
+
+function startGame() {
+    socket.emit('start game', {gameId: gameState.gameId, session: currentSessionID})
+}
+
+function hideModal() {
+    document.getElementById('modal').style.display = "none";
+}
+
+function insertModalContent() {
+
+    let option = "";
+    for (let i = 4; i < 70; i++) {
+        if (i == 8) {
+            option += "<option selected='selected' value=\"" + i + "\">" + i + "</option>\n"
+            continue;
+        }
+        option += "<option value=\"" + i + "\">" + i + "</option>\n"
+    }
+
+    let players = "";
+    for (let i = 1; i < gameState.players.length; i++) {
+        players += "<option value=\"" + i + "\">" + gameState.players[i].username + "</option>\n";
+    }
+
+    let content = "    <div class=\"modal-content\">\n" +
+        "        <span class=\"close\" id=\"close-modal\" onclick='hideModal();'>&times;</span>\n" +
+        "        <div class=\"modal-box\"><p><b>Game Config</b></p>\n" +
+        "            <label class='config-label'>Game Name:\n" +
+        "                <input type=\"text\" value='" + gameState.gameName + "'>\n" +
+        "            </label>\n" +
+        "            <label class='config-label'>\n" +
+        "                Points Goal:\n" +
+        "                <select id='points-goal'>\n" +
+        option +
+        "                </select>\n" +
+        "            </label>\n" +
+        "            <label class='config-label'>" +
+        "                Kick Player:" +
+        "                <select id='select-kick-player'>" +
+        players +
+        "                </select>" +
+        "                <button onclick='kickPlayer();'>Kick</button>" +
+        "            </label>" +
+        "        </div>\n" +
+        "    </div>\n";
+
+    document.getElementById("modal").innerHTML = content;
+}
+
+function kickPlayer() {
+    let indexToKick = document.getElementById("select-kick-player").value;
+    console.log("Kicking player " + indexToKick)
+    socket.emit("kick player from game", {session: currentSessionID, index: indexToKick, gameId: gameState.gameId});
+}
+
+function addModal() {
+
+    let modal = "<div class=\"modal\" id=\"modal\">\n" +
+        "</div>";
+
+    document.getElementById("body").innerHTML += modal;
+}
+
+var creatorOptionsAdded = false;
+
 function addCreatorOptions() {
-    document.getElementById("top-bar").innerHTML = "<button class=\"top-buttons\" onclick=\"\">Leave</button>\n" +
-        "        <button class=\"top-buttons\" onclick=\"\">Start Game</button>\n" +
+    if (gameState.players == null) {
+        return;
+    }
+    creatorOptionsAdded = true;
+    console.log("Player is creator, adding extra options...")
+    document.getElementById("top-bar").innerHTML = "<button class=\"top-buttons\" onclick=\"leaveGame();\">Leave</button>\n" +
+        "        <button class=\"top-buttons\" onclick=\"startGame();\">Start Game</button>\n" +
         "\n" +
         "        <div class=\"push-right\"></div>\n" +
         "\n" +
         "        <button class=\"top-buttons\" onclick=\"showGameConfig();\">Game Config</button>\n" +
         "        <button class=\"top-buttons right\" onclick=\"logOut()\">Log out</button>"
 
-    document.getElementById("close-modal").onclick = function () {
-        document.getElementById('modal').style.display = "none";
-    }
-    window.onclick = function(event) {
+    addModal();
+    insertModalContent();
+
+    window.onclick = function (event) {
         if (event.target == document.getElementById('modal')) {
             document.getElementById('modal').style.display = "none";
         }
@@ -90,6 +184,10 @@ function updatePlayersList() {
     document.getElementById("list-of-players").innerHTML = string;
 }
 
+function leaveGame() {
+    socket.emit('player leave game', {gameId: GAME_ID, session: currentSessionID});
+}
+
 function logOut() {
     setCookie("currentSessionID", "", 0.2);
     socket.emit('log out', currentSessionID);
@@ -102,6 +200,7 @@ window.onload = function () {
     }
     socket.emit('return player', currentSessionID);
     setCookie("currentSessionID", currentSessionID, 0.2);
+
 
 }
 

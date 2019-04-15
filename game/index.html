@@ -7,23 +7,16 @@
     <script src="client.js"></script>
     <link rel="stylesheet" href="game.css">
 </head>
-<body>
-
-<div class="modal" id="modal">
-    <div class="modal-content">
-        <span class="close" id="close-modal">&times;</span>
-        <p>Some text in das modal</p>
-    </div>
-</div>
+<body id="body">
 
 <div class="main-page">
     <nav class="top-bar" id="top-bar">
-        <button class="top-buttons" onclick="">Leave</button>
-        <button class="top-buttons" onclick="">Start Game</button>
+        <button class="top-buttons" onclick="leaveGame();">Leave</button>
+        <!--<button class="top-buttons" onclick="">Start Game</button>-->
 
         <div class="push-right"></div>
 
-        <button class="top-buttons" onclick="showGameConfig();">Game Config</button>
+        <!--<button class="top-buttons" onclick="showGameConfig();">Game Config</button>-->
         <button class="top-buttons right" onclick="logOut()">Log out</button>
     </nav>
     <div class="main-content">
@@ -34,8 +27,7 @@
                     <button class="confirm-card-choice">Confirm Selection</button>
                 </div>
                 <div class="other-player-cards-section">
-                    <div class="other-card"><p class="white-card-text">This is a white card it should be a shorter
-                        message.</p>
+                   <div class="other-card"><p class="white-card-text">This is a white card it should be a shorter message.</p>
                     </div>
                     <div class="other-card"></div>
                     <div class="other-card"></div>
@@ -45,14 +37,6 @@
                     <div class="other-card"></div>
                     <div class="other-card"></div>
                     <div class="other-card"></div>
-                    <!--<div class="other-card"></div>
-                    <div class="other-card-ghost"></div>
-                    <div class="other-card-ghost"></div>
-                    <div class="other-card-ghost"></div>
-                    <div class="other-card-ghost"></div>
-                    <div class="other-card-ghost"></div>
-                    <div class="other-card-ghost"></div>-->
-
 
                 </div>
             </div>
@@ -66,14 +50,14 @@
                 </div>
                 <div class="bottom-card-container">
                     <h4 class="bottom-card-container-title">Your Cards:</h4>
-                    <div class="cards-container">
-                        <div class="card"></div>
-                        <div class="card"></div>
-                        <div class="card"></div>
-                        <div class="card"></div>
-                        <div class="card"></div>
-                        <div class="card"></div>
-                        <div class="card"></div>
+                    <div id="cards-container" class="cards-container">
+                        <div id="card-0" class="card"></div>
+                        <div id="card-1" class="card"></div>
+                        <div id="card-2" class="card"></div>
+                        <div id="card-3" class="card"></div>
+                        <div id="card-4" class="card"></div>
+                        <div id="card-5" class="card"></div>
+                        <div id="card-6" class="card"></div>
 
 
                     </div>

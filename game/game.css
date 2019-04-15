@@ -28,9 +28,7 @@ body {
 
 .top-buttons {
     margin-left: 1%;
-    background-color: buttonface;
-    border: 2px solid buttonface;
-    border-radius: 5px;
+
     height: 50%;
 
 }
@@ -257,6 +255,7 @@ body {
     border: 2px solid black;
     border-radius: 10px;
     margin: 1%;
+    position: relative;
 }
 
 .card:before {
@@ -281,10 +280,19 @@ body {
 .modal-content {
     background-color: white;
     margin: 15% auto;
+    width: 25%;
     padding: 20px;
-    width: 80%;
     font-family: "Montserrat", sans-serif;
 
+}
+
+.modal-box {
+    display: flex;
+    flex-flow: column wrap;
+}
+
+.config-label {
+    margin: 1%;
 }
 
 .close {
@@ -298,4 +306,15 @@ body {
     color: black;
     text-decoration: none;
     cursor: pointer;
+}
+
+button {
+    background-color: buttonface;
+    border: 2px solid buttonface;
+    border-radius: 5px;
+}
+button:hover, button:focus, button:active {
+    border-top-color: #4a4a4a;
+    border-left-color: #4a4a4a;
+    background-color: #979BA0;
 }
