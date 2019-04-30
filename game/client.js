@@ -13,6 +13,9 @@ const GAME_ID = $_GET['gameId'];
 
 var gameState = {};
 
+var selectedCardNo;
+
+
 var socket = io();
 socket.on('message', function (data) {
     console.log(data);
@@ -72,12 +75,29 @@ socket.on('is creator', function () {
     isCreator = true;
 })
 
+socket.on("client is czar", activateCzarMode)
+
+function activateCzarMode(data) {
+    //todo show the czar notice thing
+    //todo change what client must do
+}
+
 function updateBottomCards() {
     let text = "";
     for (var i = 0; i < cardsData.length; i++) {
-        text += '<div id="card-' + i + '" class="card"><p class="white-card-text">' + cardsData[i].cardText + '</p></div>';
+        text += '<button id="card-' + i + '" class="card" onclick="selectCard(this);"><p class="white-card-text">' + cardsData[i].cardText + '</p></button>';
     }
     document.getElementById("cards-container").innerHTML = text;
+}
+
+function confirmCardChoice () {
+    socket.emit("choose card", {session: currentSessionID, gameId: gameState.gameId, cardIndex: selectedCardNo});
+}
+
+function selectCard(card) {
+    console.log(card);
+    selectedCardNo = parseInt(card.id[5]);
+
 }
 
 function startGame() {

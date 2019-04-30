@@ -97,15 +97,30 @@ body {
 .black-card {
     height: auto;
     width: 77%;
-    background-color: #3c3c3c;
+    background-color: #212121;
     border: 2px solid white;
     border-radius: 15px;
+    position: relative;
 }
 
 .black-card:before {
     content: "";
     display: block;
     padding-top: 140%;
+}
+
+.black-card-text {
+    position: absolute;
+    top: 0;
+    padding: 5%;
+    margin: 0;
+    font-family: "Montserrat", sans-serif;
+    font-weight: normal;
+    font-size: larger;
+    height: 100%;
+    box-sizing: border-box;
+    text-align: left;
+    color: white;
 }
 
 .confirm-card-choice {
@@ -152,6 +167,13 @@ body {
     font-family: "Montserrat", sans-serif;
     height: 100%;
     box-sizing: border-box;
+    text-align: left;
+    width: 100%;
+    font-size: larger;
+    transition: all .2s ease-in-out;
+}
+.white-card-text:hover {
+    font-size: x-large;
 }
 
 .bottom-section {
@@ -250,18 +272,33 @@ body {
 }*/
 
 .card {
-    width: 12%;
+    width: 11%;
     height: auto;
     border: 2px solid black;
     border-radius: 10px;
     margin: 1%;
     position: relative;
+    background-color: white;
+    transition: all .2s ease-in-out;
+    padding: 0;
 }
 
 .card:before {
     content: "";
     display: block;
-    padding-top: 120%;
+    padding-top: 118%;
+}
+
+.card:active, .card:focus {
+    background-color: white;
+    border-color: lightblue;
+}
+
+.card:hover {
+    background-color: white;
+    border-color: lightblue;
+    width: 18%;
+    transform: scale(0.9);
 }
 
 .modal {
@@ -313,8 +350,19 @@ button {
     border: 2px solid buttonface;
     border-radius: 5px;
 }
-button:hover, button:focus, button:active {
+button:hover, button:active {
     border-top-color: #4a4a4a;
     border-left-color: #4a4a4a;
     background-color: #979BA0;
+}
+
+*.focus {
+    outline: 0;
+}
+
+.czar-notice {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
 }

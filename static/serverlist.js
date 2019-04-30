@@ -17,12 +17,12 @@ socket.on('connect user to game', function (gameId) {
     window.location.href = "/game?gameId=" + gameId;
 })
 
-socket.on('logged out', function() {
+socket.on('logged out', function () {
     window.location.href = "../";
 
 })
 
-socket.on('session not found', function() {
+socket.on('session not found', function () {
     setCookie("currentSessionID", "", 0.2);
     window.location.href = "../";
 })
@@ -32,7 +32,6 @@ socket.on('receive game list', function (data) {
     for (let i = 0; i < data.length; i++) {
         console.log(data[i])
         let lobby = data[i];
-
         let box = "<div class=\"openGame\">\n" +
             "            <div class=\"gameInfo\">\n" +
             "                <h3 class=\"gameTitle\">" + lobby.gameName + "</h3>\n" +
@@ -40,14 +39,13 @@ socket.on('receive game list', function (data) {
             "                <p class=\"playersInGame infoChunk\"><b>Players:</b> " + lobby.numberPlayers + "/9</p>\n" +
             "            </div>\n" +
             "            <div class=\"gameButtons\">\n" +
-            "                <button class=\"indButton\" onclick='requestJoinGame("+ lobby.id +")'>Join Game</button>\n" +
+            "                <button class=\"indButton\" onclick='requestJoinGame(" + lobby.id + ")'>Join Game</button>\n" +
             "            </div>\n" +
             "        </div>";
         htmlOut += box;
     }
     document.getElementById("openGamesContainer").innerHTML = htmlOut;
 });
-
 
 
 let currentUsername;

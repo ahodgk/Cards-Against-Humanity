@@ -6,6 +6,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="client.js"></script>
     <link rel="stylesheet" href="game.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 </head>
 <body id="body">
 
@@ -23,8 +24,8 @@
         <div class="main-game">
             <div class="top-section">
                 <div class="black-card-section">
-                    <div class="black-card"></div>
-                    <button class="confirm-card-choice">Confirm Selection</button>
+                    <div class="black-card"><p class="black-card-text">&#f521;This is das schwarz card text _____ es ist long _____ ja.</p></div>
+                    <button onclick="confirmCardChoice()" class="confirm-card-choice">Confirm Selection</button>
                 </div>
                 <div class="other-player-cards-section">
                    <div class="other-card"><p class="white-card-text">This is a white card it should be a shorter message.</p>
@@ -49,16 +50,9 @@
                     </div>
                 </div>
                 <div class="bottom-card-container">
+                    <div class="czar-notice"><div class="czar-notice-box">TODO THIS</div></div>
                     <h4 class="bottom-card-container-title">Your Cards:</h4>
                     <div id="cards-container" class="cards-container">
-                        <div id="card-0" class="card"></div>
-                        <div id="card-1" class="card"></div>
-                        <div id="card-2" class="card"></div>
-                        <div id="card-3" class="card"></div>
-                        <div id="card-4" class="card"></div>
-                        <div id="card-5" class="card"></div>
-                        <div id="card-6" class="card"></div>
-
 
                     </div>
                 </div>

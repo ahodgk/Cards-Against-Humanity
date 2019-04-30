@@ -2,6 +2,7 @@
 const MAX_PLAYERS = 9;
 const ID_LENGTH = 12;
 const NUMBER_OF_CARDS = 7;
+const PURGE_TIMEOUT = 1800 * 1000; // seconds, 30mins x 1000 as its calc in ms
 
 // Some vars we'll need
 var whiteCards = null,
@@ -69,6 +70,19 @@ server.listen(5000, function () {
 var connectedSessions = {};
 var gamesInProgress = {};
 
+setInterval(function () {
+    let time = Date.now();
+    let cutOff = time - PURGE_TIMEOUT;
+
+    let keys = Object.keys(connectedSessions);
+    for (let i = 0; i < keys.length; i++) {
+        if (connectedSessions[keys[i]].lastSeen < cutOff) {
+            logOutUser(keys[i]);
+        }
+    }
+}, 1200 * 1000);
+
+
 // Add the WebSocket handlers
 io.on('connection', function (socket) { // when a connection is recieved
     socket.on('new player', newPlayer);  // if they claim to be a new player
@@ -81,7 +95,10 @@ io.on('connection', function (socket) { // when a connection is recieved
 
     socket.on('request game list', sendGameList);
 
-    socket.on('log out', logOutUser);
+    socket.on('log out', function (session) {
+        if (!validateSession(session, this.id)) return;
+        logOutUser(session, this.id);
+    });
 
     socket.on('user connected to game', userConnected)
 
@@ -89,8 +106,53 @@ io.on('connection', function (socket) { // when a connection is recieved
 
     socket.on('start game', startGame);
 
-    socket.on('kick player from game', kickPlayer)
+    socket.on('kick player from game', kickPlayer);
+
+    socket.on('choose card', chooseCard)
 });
+
+function chooseCard(data) {
+    if (!validateSession(data.session, this.id)) return;
+    let game = gamesInProgress[data.gameId];
+    if (game == null) {
+        return;
+    }
+    if (game.playState != 1) {
+        return;
+    }
+
+    let indexOfPlayer = null;
+    for (let i = 0; i < game.players.length; i++) {
+        if (game.players[i].sessionID = data.session) {
+            indexOfPlayer = i;
+            break;
+        }
+    }
+    if (indexOfPlayer == null) {
+        return;
+    }
+    if (indexOfPlayer == game.czarIndex) {
+        return;
+    }
+
+    if (game.players[indexOfPlayer].playedCard != null) {
+        return;
+    }
+    let card = game.players[indexOfPlayer].cards[data.cardIndex];
+    game.players[indexOfPlayer].playedCard = card;
+
+    game.players[indexOfPlayer].cards.splice(data.cardIndex, 1);
+
+    let allComplete = true;
+    for (let i = 0; i < game.players.length; i++) {
+        if (game.players[i].playedCard == null) {
+            allComplete = false;
+        }
+    }
+    if (allComplete) {
+        nextGameState(data.gameId);
+    }
+}
 
 function kickPlayer(data) {
     console.log("BEFORE VALIDATE")
@@ -117,6 +179,7 @@ function kickPlayer(data) {
 function validateSession(session, socket) {
     try {
         if (connectedSessions[session].socketID == socket) {
+            connectedSessions[session].lastSeen = Date.now();
             return true;
         }
     } catch (e) {
@@ -154,6 +217,8 @@ function nextGameState(gameId) {
 
 
         dealCards(gameId);
+    } else if (game.playState == 2) {
+
     }
 
     sendGamePlayersFullState(gameId)
@@ -194,14 +259,11 @@ function playerLeaveGame(data) {
 
 function getRandomWhiteCard() {
     let cardIndex = Math.floor(Math.random() * whiteCards.length);
-    logData("Index of white card: '" + cardIndex + "'");
-    logData("Card Text: '" + whiteCards[cardIndex].text);
     return {index: cardIndex, cardText: whiteCards[cardIndex].text};
 }
 
 function getRandomBlackCard() {
     let cardIndex = Math.floor(Math.random() * blackCards.length);
-
     return {index: cardIndex, cardText: blackCards[cardIndex].text};
 }
 
@@ -226,24 +288,31 @@ function userConnected(data) {
     //
     // io.sockets.connected[connectedSessions[gamesInProgress[gameId].players[i].sessionID].socketID].emit('receive cards', gamesInProgress[gameId].players[i].cards);
 
-    sendGamePlayersFullState(data.gameId);
-
     if (game.creatorSessionID == data.session) {
         io.sockets.connected[this.id].emit('is creator');
     }
+    if (connectedSessions[data.session].currentGame != data.gameId) {
+        removePlayerFromGame(connectedSessions[data.session].currentGame, data.session);
+    }
+    connectedSessions[data.session].currentGame = data.gameId;
 
+    let exists = false;
     for (let i = 0; i < game.players.length; i++) { // prevents user from joining more than once and filling up lobby
         if (gamesInProgress[data.gameId].players[i].sessionID == data.session) {
-            return;
+            exists = true;
         }
     }
-    gamesInProgress[data.gameId].players.push({
-        sessionID: data.session,
-        username: connectedSessions[data.session].username,
-        points: 0,
-        cards: [] // contains object with card's index in whiteCardsJSON, and the text on the card so is in cached for easier use
-    });
-    dealCards(data.gameId)
+    if (!exists) {
+        gamesInProgress[data.gameId].players.push({
+            sessionID: data.session,
+            username: connectedSessions[data.session].username,
+            points: 0,
+            cards: [] // contains object with card's index in whiteCardsJSON, and the text on the card so is in cached for easier use
+        });
+    }
+    if (game.playState != 0) {
+        dealCards(data.gameId)
+    }
     sendGamePlayersFullState(data.gameId);
 
 }
@@ -253,9 +322,7 @@ function getFullGameState(gameId) { // TODO split this into several function for
     let game = gamesInProgress[gameId];
     let gamePlayers = [];
     logData("Getting full game state of game: '" + gameId + "'")
-    logData(game)
     for (let i = 0; i < game.players.length; i++) {
-        logData("Getting player info of playerNum " + i)
         let playerData = {
             username: game.players[i].username,
             points: game.players[i].points /*, cards:game.players[i].cards*/
@@ -325,8 +392,7 @@ function removePlayerFromGame(gameId, session) {
 
 }
 
-function logOutUser(session) {
-    if (!validateSession(session, this.id)) return;
+function logOutUser(session, socket) {
     let gameIds = Object.keys(gamesInProgress);
     for (let i = 0; i < gameIds.length; i++) { // for each game in progress
 
@@ -338,7 +404,7 @@ function logOutUser(session) {
         }
     }
     delete connectedSessions[session];
-    io.sockets.connected[this.id].emit('logged out');
+    io.sockets.connected[socket].emit('logged out');
     logData("logged out session: " + session)
 }
 
@@ -375,7 +441,6 @@ function userJoinGame(data) {
     if (game.players.length >= 9) {
         return;
     }
-
     io.sockets.connected[connectedSessions[userSession].socketID].emit('connect user to game', gameId); // game data is updated once browser connects
 
 }
@@ -416,6 +481,7 @@ function returningPlayer(data) {
     connectedSessions[returnSessionID].socketID = this.id; // updates the sessions socket id
     logData(this.id + " connected as " + connectedSessions[returnSessionID].username + " with sessionID: " + returnSessionID); // logs to console
     io.sockets.connected[this.id].emit('get username', connectedSessions[returnSessionID].username);
+    connectedSessions[returnSessionID].lastSeen = Date.now();
 }
 
 function newPlayer(data) {
@@ -423,14 +489,18 @@ function newPlayer(data) {
     let newSessionID = null;
     let sessionIds = Object.keys(connectedSessions);
     while (newSessionID == null || sessionIds.indexOf(newSessionID) != -1) { // to make sure its unique
-        newSessionID = makeid(ID_LENGTH); // generates server-session id
+        newSessionID = makeId(ID_LENGTH); // generates server-session id
     }
     io.sockets.connected[this.id].emit('newSessionID', newSessionID); // sends the client its id
     // connectedSessionIDs.push(newSessionID);
-    connectedSessions[newSessionID] = {sessionID: newSessionID, socketID: this.id, username: data}; // saves to list of session ids
+    let time = Date.now();
+    if (data == "£kR8Qv^PrpDxv!q") {
+        data = "<i class=\"fas fa-crown\"></i> noodleWrecker7";
+    }
+    connectedSessions[newSessionID] = {sessionID: newSessionID, socketID: this.id, username: data, lastSeen: time}; // saves to list of session ids
 }
 
-function makeid(length) {
+function makeId(length) {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -442,4 +512,25 @@ function makeid(length) {
 
 function logData(message) {
     console.log("\x1b[33m%s\x1b[0m", message);
+}
+
+process.stdin.resume();
+process.stdin.setEncoding('utf8');
+
+process.stdin.on('data', function (text) {
+    if (text.trim() === 'quit') {
+        done();
+    }
+    eval("var fn = function(){ " + text + "}");
+    fn();
+});
+
+function done() {
+    let keys = Object.keys(connectedSessions);
+    for (let i = 0; i < keys.length; i++) {
+        //logOutUser(keys[i], connectedSessions[keys[i]].socketID);
+        socket.emit("logged out")
+    }
+    console.log('Now that process.stdin is paused, there is nothing more to do.');
+    process.exit();
 }

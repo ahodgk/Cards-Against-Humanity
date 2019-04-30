@@ -1,5 +1,5 @@
 let currentSessionID = getCookie("currentSessionID");
-if(currentSessionID != "" && currentSessionID != null) {
+if (currentSessionID != "" && currentSessionID != null) {
     window.location.href = "/static/serverlist.html";
 }
 
@@ -15,6 +15,9 @@ socket.on('newSessionID', function (data) {
 
 function connect(form) {
     let name = htmlEscape(form.username.value);
+    if (name == " " || name == "" || name == null) {
+        return;
+    }
     socket.emit('new player', name);
     console.log(name);
     setCookie("currentUsername", name, 0.2);
