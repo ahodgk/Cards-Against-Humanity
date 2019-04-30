@@ -19,7 +19,9 @@ var app = express();
 var server = http.Server(app);
 var io = socketIO(server);
 
-app.set('port', 5000);
+const PORT = process.env.PORT || 5000;
+
+app.set('port', PORT);
 app.use('/static', express.static(__dirname + '/static'));
 app.use('/game', express.static(__dirname + '/game'));
 
@@ -59,7 +61,7 @@ app.get('/', function (request, response) {
 });
 
 // Starts server
-server.listen(5000, function () {
+server.listen(PORT, function () {
     console.log(__dirname);
     console.log('\x1b[32mStarting  server on port 5000\x1b[0m');
     getWhiteCardsJSON();
