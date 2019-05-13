@@ -136,7 +136,6 @@ function chooseCard(data) {
     if (indexOfPlayer == game.czarIndex) {
         return;
     }
-
     if (game.players[indexOfPlayer].playedCard != null) {
         return;
     }
@@ -147,7 +146,7 @@ function chooseCard(data) {
 
     let allComplete = true;
     for (let i = 0; i < game.players.length; i++) {
-        if (game.players[i].playedCard == null) {
+        if (game.players[i].playedCard == null && i != indexOfPlayer) {
             allComplete = false;
         }
     }
@@ -201,7 +200,7 @@ function dealCards(gameId) {
     }
 }
 
-function nextGameState(gameId) {
+function nextGameState(gameId) { // TODO add a timer for each state
     let game = gamesInProgress[gameId];
     game.playState += 1;
     if (game.playState > 3) {
@@ -215,12 +214,22 @@ function nextGameState(gameId) {
             game.playStateInfo.czarIndex = 0;
         }
         game.playStateInfo.czarSession = game.players[game.playStateInfo.czarIndex].sessionID;
-        io.sockets.connected[connectedSessions[game.playStateInfo.czarSession].socketID].emit("client is czar")
+        io.sockets.connected[connectedSessions[game.playStateInfo.czarSession].socketID].emit("client is czar");
 
 
         dealCards(gameId);
-    } else if (game.playState == 2) {
+    } else if (game.playState == 2) { // czar picks
+        // creating an object to store the top cards
 
+        let object = [];
+
+        for (let i = 0; i < game.players.length; i++) {
+            if (i == game.playStateInfo.czarIndex) continue;
+            object.push({card: game.players[i].playedCard, playerIndex: i})
+        }
+        shuffle(object);
+
+        game.playStateInfo.topCards = object;
     }
 
     sendGamePlayersFullState(gameId)
@@ -341,6 +350,10 @@ function getFullGameState(gameId) { // TODO split this into several function for
         pointsGoal: game.pointsGoal,
         playState: game.playState
     };
+    // extras
+    if (game.playState == 2) {
+        returnObject.topCards = game.playStateInfo.topCards;
+    }
     return returnObject;
 
 }
@@ -354,7 +367,7 @@ function sendGamePlayersFullState(gameId) {
         if (gamesInProgress[gameId].players[i].cards.length < 1) {
             continue;
         }
-        io.sockets.connected[connectedSessions[gamesInProgress[gameId].players[i].sessionID].socketID].emit('receive cards', gamesInProgress[gameId].players[i].cards);
+        io.sockets.connected[connectedSessions[gamesInProgress[gameId].players[i].sessionID].socketID].emit('receive bottom cards', gamesInProgress[gameId].players[i].cards);
     }
 }
 
@@ -378,7 +391,7 @@ function removePlayerFromGame(gameId, session) {
 
         return; //
     }
-
+    //TODO replace this with a queue to remove them when it gets back to deal cards
     for (let j = 0; j < gamesInProgress[gameId].players.length; j++) { // for each player in the game
         if (gamesInProgress[gameId].players[j].sessionID == session) { // if they match the one being removed
             gamesInProgress[gameId].players.splice(j, 1); // remove them
@@ -531,8 +544,17 @@ function done() {
     let keys = Object.keys(connectedSessions);
     for (let i = 0; i < keys.length; i++) {
         //logOutUser(keys[i], connectedSessions[keys[i]].socketID);
-        socket.emit("logged out")
+        io.sockets.emit("logged out")
     }
     console.log('Now that process.stdin is paused, there is nothing more to do.');
     process.exit();
+}
+
+io.sockets.emit("logged out");
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
 }

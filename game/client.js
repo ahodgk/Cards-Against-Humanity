@@ -12,7 +12,7 @@ for (var i = 0; i < parts.length; i++) {
 const GAME_ID = $_GET['gameId'];
 
 var gameState = {};
-
+var bottomCardsData;
 var selectedCardNo;
 
 
@@ -60,9 +60,12 @@ socket.on('receive full game state', function (data) {
         addCreatorOptions();
     }
 })
-
-socket.on('receive cards', function (data) {
-    cardsData = data;
+// todo display top cards
+// todo display black card
+// todo click top cards
+// todo czar notice
+socket.on('receive bottom cards', function (data) {
+    bottomCardsData = data;
     updateBottomCards();
 })
 
@@ -79,18 +82,20 @@ socket.on("client is czar", activateCzarMode)
 
 function activateCzarMode(data) {
     //todo show the czar notice thing
+    document.getElementById("czar-notice").style.display = "block";
     //todo change what client must do
+
 }
 
 function updateBottomCards() {
     let text = "";
-    for (var i = 0; i < cardsData.length; i++) {
-        text += '<button id="card-' + i + '" class="card" onclick="selectCard(this);"><p class="white-card-text">' + cardsData[i].cardText + '</p></button>';
+    for (var i = 0; i < bottomCardsData.length; i++) {
+        text += '<button id="card-' + i + '" class="card" onclick="selectCard(this);"><p class="white-card-text">' + bottomCardsData[i].cardText + '</p></button>';
     }
     document.getElementById("cards-container").innerHTML = text;
 }
 
-function confirmCardChoice () {
+function confirmCardChoice() {
     socket.emit("choose card", {session: currentSessionID, gameId: gameState.gameId, cardIndex: selectedCardNo});
 }
 

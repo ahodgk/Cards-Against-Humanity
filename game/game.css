@@ -172,6 +172,7 @@ body {
     font-size: larger;
     transition: all .2s ease-in-out;
 }
+
 .white-card-text:hover {
     font-size: x-large;
 }
@@ -238,6 +239,7 @@ body {
     display: inline-block;
     float: left;
     border-left: 1px solid grey;
+    position: relative;
 }
 
 .bottom-card-container-title {
@@ -350,6 +352,7 @@ button {
     border: 2px solid buttonface;
     border-radius: 5px;
 }
+
 button:hover, button:active {
     border-top-color: #4a4a4a;
     border-left-color: #4a4a4a;
@@ -363,6 +366,18 @@ button:hover, button:active {
 .czar-notice {
     position: absolute;
     width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.4);
+    height: 80%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: none;
+    z-index: 2;
+    margin-top: 3%;
+}
+
+.czar-notice-box {
+    position: relative;
+    background-color: white;
+    width: 20%;
+    margin: auto;
+    top: 50%;
+    font-size: xx-large;
 }
