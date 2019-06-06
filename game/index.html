@@ -6,7 +6,8 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="client.js"></script>
     <link rel="stylesheet" href="game.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+          integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 </head>
 <body id="body">
 
@@ -18,26 +19,27 @@
         <div class="push-right"></div>
 
         <!--<button class="top-buttons" onclick="showGameConfig();">Game Config</button>-->
-        <button class="top-buttons right" onclick="logOut()">Log out</button>
+        <button class="top-buttons right-button" onclick="logOut()">Log out</button>
     </nav>
     <div class="main-content">
         <div class="main-game">
             <div class="top-section">
                 <div class="black-card-section">
-                    <div class="black-card"><p class="black-card-text">&#f521;This is das schwarz card text _____ es ist long _____ ja.</p></div>
+                    <div class="black-card"><p class="black-card-text" id="black-card-text">&#f521;This is das schwarz card text _____ es ist
+                        long _____ ja.</p></div>
                     <button onclick="confirmCardChoice()" class="confirm-card-choice">Confirm Selection</button>
                 </div>
                 <div class="other-player-cards-section">
-                   <div class="other-card"><p class="white-card-text">This is a white card it should be a shorter message.</p>
+<!--todo sort out the id's for containers and individual cards-->
+                    <div class="top-white-card-container double-card-container">
+                        <div class="top-white-card half-card left"><p id="top-white-card-0" class="white-card-text">
+                            Message</p></div>
+                        <div class="top-white-card half-card right"><p id="top-white-card-1" class="white-card-text">
+                            Message 2</p></div>
                     </div>
-                    <div class="other-card"></div>
-                    <div class="other-card"></div>
-                    <div class="other-card"></div>
-                    <div class="other-card"></div>
-                    <div class="other-card"></div>
-                    <div class="other-card"></div>
-                    <div class="other-card"></div>
-                    <div class="other-card"></div>
+                    <div class="top-white-card-container single-card-container">
+                        <div class="top-white-card full-card"></div>
+                    </div>
 
                 </div>
             </div>
@@ -50,7 +52,9 @@
                     </div>
                 </div>
                 <div class="bottom-card-container">
-                    <div id="czar-notice" class="czar-notice"><div class="czar-notice-box">YOU ARE CARD CZAR</div></div>
+                    <div id="czar-notice" class="czar-notice">
+                        <div class="czar-notice-box"><p>YOU ARE CARD CZAR</p></div>
+                    </div>
                     <h4 class="bottom-card-container-title">Your Cards:</h4>
                     <div id="cards-container" class="cards-container">
 

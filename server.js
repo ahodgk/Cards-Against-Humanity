@@ -114,6 +114,7 @@ io.on('connection', function (socket) { // when a connection is recieved
 });
 
 function chooseCard(data) {
+    // validation
     if (!validateSession(data.session, this.id)) return;
     let game = gamesInProgress[data.gameId];
     if (game == null) {
@@ -133,12 +134,14 @@ function chooseCard(data) {
     if (indexOfPlayer == null) {
         return;
     }
-    if (indexOfPlayer == game.czarIndex) {
+    if (indexOfPlayer == game.playStateInfo.czarIndex) {
         return;
     }
     if (game.players[indexOfPlayer].playedCard != null) {
         return;
     }
+    // doing shit
+
     let card = game.players[indexOfPlayer].cards[data.cardIndex];
     game.players[indexOfPlayer].playedCard = card;
 
@@ -208,6 +211,11 @@ function nextGameState(gameId) { // TODO add a timer for each state
     }
     if (game.playState == 1) { // players choose cards
         // todo AHHHHHHHHHHHHHHHHHHHH
+        // get a black card
+        let card = getRandomBlackCard();
+        game.playStateInfo.blackCard = card;
+        game.playStateInfo.cardsToChoose = card.rule;
+
         // setting czar
         game.playStateInfo.czarIndex++;
         if (game.playStateInfo.czarIndex >= game.players.length) {
@@ -218,13 +226,14 @@ function nextGameState(gameId) { // TODO add a timer for each state
 
 
         dealCards(gameId);
-    } else if (game.playState == 2) { // czar picks
+    } else if (game.playState == 2) { // czar picks / choosing state
         // creating an object to store the top cards
 
         let object = [];
 
         for (let i = 0; i < game.players.length; i++) {
             if (i == game.playStateInfo.czarIndex) continue;
+            let container = {};
             object.push({card: game.players[i].playedCard, playerIndex: i})
         }
         shuffle(object);
@@ -275,7 +284,15 @@ function getRandomWhiteCard() {
 
 function getRandomBlackCard() {
     let cardIndex = Math.floor(Math.random() * blackCards.length);
-    return {index: cardIndex, cardText: blackCards[cardIndex].text};
+
+    let rule = blackCards[cardIndex].rule;
+    let pick = 1;
+    if (rule != null) {
+        if (rule.includes("PICK 2")) pick = 2;
+        if (rule.includes("PICK 3")) pick = 3;
+    }
+
+    return {index: cardIndex, cardText: blackCards[cardIndex].text, rule: pick};
 }
 
 function userConnected(data) {
@@ -340,20 +357,27 @@ function getFullGameState(gameId) { // TODO split this into several function for
         };
         gamePlayers.push(playerData);
     }
+    let playStateInfo = {
+        czarIndex: game.playStateInfo.czarIndex,
+        topCards: game.playStateInfo.topCards,
+        blackCard: game.playStateInfo.blackCard
+    }
+
     let returnObject = {
         gameName: game.gameName,
         gameId: game.gameId,
         players: gamePlayers,
         status: game.status,
-        czarIndex: game.czarIndex,
+        //czarIndex: game.playStateInfo.czarIndex,
+        playStateInfo: playStateInfo,
         round: game.round,
         pointsGoal: game.pointsGoal,
         playState: game.playState
     };
     // extras
-    if (game.playState == 2) {
-        returnObject.topCards = game.playStateInfo.topCards;
-    }
+    /*   if (game.playState == 2) {
+           returnObject.topCards = game.playStateInfo.topCards;
+       }*/
     return returnObject;
 
 }
@@ -363,11 +387,16 @@ function sendGamePlayersFullState(gameId) {
     // logData("Full Game State dump :");
     // console.log(fullGameState)
     for (let i = 0; i < gamesInProgress[gameId].players.length; i++) {
-        io.sockets.connected[connectedSessions[gamesInProgress[gameId].players[i].sessionID].socketID].emit('receive full game state', fullGameState);
+        let socketId = connectedSessions[gamesInProgress[gameId].players[i].sessionID].socketID;
+        io.sockets.connected[socketId].emit('receive full game state', fullGameState);
+        if (fullGameState.czarIndex == i) {
+            io.sockets.connected[socketId].emit('client is czar');
+        }
+
         if (gamesInProgress[gameId].players[i].cards.length < 1) {
             continue;
         }
-        io.sockets.connected[connectedSessions[gamesInProgress[gameId].players[i].sessionID].socketID].emit('receive bottom cards', gamesInProgress[gameId].players[i].cards);
+        io.sockets.connected[socketId].emit('receive bottom cards', gamesInProgress[gameId].players[i].cards);
     }
 }
 
@@ -475,12 +504,12 @@ function createGame(data) {
         gameName: gameName,
         creatorSessionID: creator,
         gameId: gId,
-        players: [],
+        players: [], // strores everything about players
         status: 0,
         round: 0,
         pointsGoal: 12,
         playState: 0, // 0 - not started, 1 - players are choosing cards, 2 - czar is choosing cards, 3 - time betweeen
-        playStateInfo: {czarIndex: -1} // stores info about cards played and whatnot
+        playStateInfo: {czarIndex: -1} // stores info about cards played and whatnot - specific state of round
 
     };
     gamesInProgress[gId] = game;
@@ -536,8 +565,12 @@ process.stdin.on('data', function (text) {
     if (text.trim() === 'quit') {
         done();
     }
-    eval("var fn = function(){ " + text + "}");
-    fn();
+    try {
+        eval("var fn = function(){ " + text + "}");
+        fn();
+    } catch (e) {
+        console.log(e)
+    }
 });
 
 function done() {

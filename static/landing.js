@@ -11,6 +11,7 @@ socket.on('message', function (data) {
 socket.on('newSessionID', function (data) {
     currentSessionID = data;
     setCookie("currentSessionID", currentSessionID, 0.2);
+    window.location.href = "/static/serverlist.html";
 })
 
 function connect(form) {
@@ -22,7 +23,7 @@ function connect(form) {
     console.log(name);
     setCookie("currentUsername", name, 0.2);
 
-    window.location.href = "/static/serverlist.html";
+    //window.location.href = "/static/serverlist.html";
 }
 
 function setCookie(cname, cvalue, exdays) {

@@ -33,7 +33,7 @@ body {
 
 }
 
-.right {
+.right-button {
     margin-right: 1%;
 }
 
@@ -142,10 +142,11 @@ body {
     align-items: center;
     justify-content: flex-start;
     flex-flow: row nowrap;
+    overflow: auto;
 }
 
-.other-card {
-    width: 12%;
+.top-white-card-container {
+
     height: auto;
     border: 2px solid black;
     border-radius: 10px;
@@ -153,10 +154,53 @@ body {
     position: relative;
 }
 
-.other-card:before {
+.single-card-container {
+    width: 12%;
+    min-width: 170px;
+}
+
+.double-card-container {
+    width: 24%;
+    min-width: 310px;
+}
+
+.top-white-card {
+    height: 100%;
+    border: 2px solid black;
+    border-radius: 10px;
+    box-sizing: border-box;
+    /*margin: 0.5%;*/
+    position: absolute;
+    top: 0;
+}
+
+.full-card {
+    width: 100%;
+}
+
+.half-card {
+    width: 50%;
+}
+
+.left {
+
+}
+
+.right {
+    margin-left: 50%;
+}
+
+.double-card-container:before {
+    padding-top: 60%;
+}
+
+.single-card-container:before {
+    padding-top: 120%;
+}
+
+.top-white-card-container:before {
     content: "";
     display: block;
-    padding-top: 120%;
 }
 
 .white-card-text {
@@ -366,18 +410,23 @@ button:hover, button:active {
 .czar-notice {
     position: absolute;
     width: 100%;
-    height: 80%;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.4);
     display: none;
     z-index: 2;
-    margin-top: 3%;
+    font-family: "Montserrat", sans-serif;
 }
 
 .czar-notice-box {
     position: relative;
     background-color: white;
-    width: 20%;
+    width: 25%;
     margin: auto;
-    top: 50%;
+    top: 40%;
     font-size: xx-large;
+    text-align: center;
+}
+
+.czar-notice-box > p {
+    position: relative;
 }

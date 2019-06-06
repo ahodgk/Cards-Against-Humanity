@@ -52,6 +52,16 @@ socket.on('receive full game state', function (data) {
     gameState = data;
     console.log(gameState)
     updatePlayersList();
+
+    if(gameState.playState == 1) {
+        updateBlackCard();
+    }
+
+    if (gameState.playState == 2) {
+        showTopCards();
+    }
+
+
     if (creatorOptionsAdded) {
         insertModalContent();
         return;
@@ -60,8 +70,27 @@ socket.on('receive full game state', function (data) {
         addCreatorOptions();
     }
 })
-// todo display top cards
+
+// todo display top cards - WIP
+function showTopCards() {
+    if (!(gameState.playState == 2 || gameState.playState == 3)) {
+        return;
+    }
+    let tempCards = gameState.playStateInfo.topCards;
+
+
+    //todo integrate multiple card plays
+
+}
+
 // todo display black card
+
+function updateBlackCard() {
+    let blackCard =  gameState.playStateInfo.blackCard;
+    document.getElementById("black-card-text").innerText = blackCard.cardText;
+}
+
+
 // todo click top cards
 // todo czar notice
 socket.on('receive bottom cards', function (data) {
@@ -78,10 +107,9 @@ socket.on('is creator', function () {
     isCreator = true;
 })
 
-socket.on("client is czar", activateCzarMode)
+socket.on("client is czar", activateCzarMode);
 
 function activateCzarMode(data) {
-    //todo show the czar notice thing
     document.getElementById("czar-notice").style.display = "block";
     //todo change what client must do
 
@@ -181,8 +209,8 @@ function addCreatorOptions() {
         "\n" +
         "        <div class=\"push-right\"></div>\n" +
         "\n" +
-        "        <button class=\"top-buttons\" onclick=\"showGameConfig();\">Game Config</button>\n" +
-        "        <button class=\"top-buttons right\" onclick=\"logOut()\">Log out</button>"
+        "        <button class=\"top-buttons right-button\" onclick=\"showGameConfig();\">Game Config</button>\n" +
+        "        <button class=\"top-buttons right-button\" onclick=\"logOut()\">Log out</button>"
 
     addModal();
     insertModalContent();
