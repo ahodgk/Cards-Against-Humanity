@@ -310,7 +310,15 @@ function userConnected(data) {
         return;
     }
 
-    if (game.players.length >= 9) {
+    // this checks if the user is already in the game
+    let exists = false;
+    for (let i = 0; i < game.players.length; i++) { // prevents user from joining more than once and filling up lobby
+        if (gamesInProgress[data.gameId].players[i].sessionID == data.session) {
+            exists = true;
+        }
+    }
+
+    if (game.players.length >= 9 && !exists) { // only checks if game is full if they are a new player
         io.sockets.connected[this.id].emit('game is full');
         return;
     }
@@ -322,20 +330,13 @@ function userConnected(data) {
     //
     // io.sockets.connected[connectedSessions[gamesInProgress[gameId].players[i].sessionID].socketID].emit('receive cards', gamesInProgress[gameId].players[i].cards);
 
-    if (game.creatorSessionID == data.session) {
-        io.sockets.connected[this.id].emit('is creator');
-    }
+    //if()
     if (connectedSessions[data.session].currentGame != data.gameId) {
         removePlayerFromGame(connectedSessions[data.session].currentGame, data.session);
     }
     connectedSessions[data.session].currentGame = data.gameId;
 
-    let exists = false;
-    for (let i = 0; i < game.players.length; i++) { // prevents user from joining more than once and filling up lobby
-        if (gamesInProgress[data.gameId].players[i].sessionID == data.session) {
-            exists = true;
-        }
-    }
+
     if (!exists) {
         gamesInProgress[data.gameId].players.push({
             sessionID: data.session,
@@ -347,7 +348,11 @@ function userConnected(data) {
     if (game.playState != 0) {
         dealCards(data.gameId)
     }
+
     sendGamePlayersFullState(data.gameId);
+    if (game.creatorSessionID == data.session) {
+        io.sockets.connected[this.id].emit('is creator');
+    }
 
 }
 
@@ -395,7 +400,7 @@ function sendGamePlayersFullState(gameId) {
     for (let i = 0; i < gamesInProgress[gameId].players.length; i++) {
         let socketId = connectedSessions[gamesInProgress[gameId].players[i].sessionID].socketID;
         io.sockets.connected[socketId].emit('receive full game state', fullGameState);
-        if (fullGameState.czarIndex == i) {
+        if (fullGameState.playStateInfo.czarIndex == i) {
             io.sockets.connected[socketId].emit('client is czar');
         }
 
@@ -478,7 +483,7 @@ function sendGameList(sessionID) {
     io.sockets.connected[connectedSessions[sessionID].socketID].emit('receive game list', returnObject);
 }
 
-function userJoinGame(data) {
+function userJoinGame(data) { // when request to join game through game list
     logData("User attempting to join game '" + data.gameId + "' as session '" + data.sessionID + "'")
     if (!validateSession(data.sessionID, this.id)) {
         console.log("INVALIDIDATED");
