@@ -117,39 +117,42 @@ function chooseCard(data) {
     // validation
     if (!validateSession(data.session, this.id)) return;
     let game = gamesInProgress[data.gameId];
-    if (game == null) {
+    if (game == null) { // if game no exist
         return;
     }
-    if (game.playState != 1) {
+    if (game.playState != 1) { // if game isnt in choosing state
         return;
     }
 
     let indexOfPlayer = null;
-    for (let i = 0; i < game.players.length; i++) {
+    for (let i = 0; i < game.players.length; i++) { // find player index
         if (game.players[i].sessionID = data.session) {
             indexOfPlayer = i;
             break;
         }
     }
-    if (indexOfPlayer == null) {
+    if (indexOfPlayer == null) { // if player not exist
         return;
     }
-    if (indexOfPlayer == game.playStateInfo.czarIndex) {
+    if (indexOfPlayer == game.playStateInfo.czarIndex) { // if player is czar
         return;
     }
-    if (game.players[indexOfPlayer].playedCard != null) {
+    if (game.players[indexOfPlayer].playedCards == null) {
+        return;
+    }
+    if (game.players[indexOfPlayer].playedCards.length >= game.playStateInfo.cardsToChoose) {
         return;
     }
     // doing shit
 
     let card = game.players[indexOfPlayer].cards[data.cardIndex];
-    game.players[indexOfPlayer].playedCard = card;
+    game.players[indexOfPlayer].playedCards.push(card);
 
     game.players[indexOfPlayer].cards.splice(data.cardIndex, 1);
 
     let allComplete = true;
     for (let i = 0; i < game.players.length; i++) {
-        if (game.players[i].playedCard == null && i != indexOfPlayer) {
+        if (game.players[i].playedCards.length < game.playStateInfo.cardsToChoose) {
             allComplete = false;
         }
     }
@@ -212,9 +215,12 @@ function nextGameState(gameId) { // TODO add a timer for each state
     if (game.playState == 1) { // players choose cards
         // todo AHHHHHHHHHHHHHHHHHHHH
         // get a black card
-        let card = getRandomBlackCard();
+        let card = getRandomBlackCard(); // {index: cardIndex, cardText: blackCards[cardIndex].text, rule: pick}
         game.playStateInfo.blackCard = card;
         game.playStateInfo.cardsToChoose = card.rule;
+        for (let i = 0; i < game.players.length; i++) {
+            game.players[i].playedCards = [];
+        }
 
         // setting czar
         game.playStateInfo.czarIndex++;
@@ -234,9 +240,9 @@ function nextGameState(gameId) { // TODO add a timer for each state
         for (let i = 0; i < game.players.length; i++) {
             if (i == game.playStateInfo.czarIndex) continue;
             let container = {};
-            object.push({card: game.players[i].playedCard, playerIndex: i})
+            object.push({cards: game.players[i].playedCards, playerIndex: i})
         }
-        shuffle(object);
+        shuffle(object); // so order is unkown, only happens on state change
 
         game.playStateInfo.topCards = object;
     }

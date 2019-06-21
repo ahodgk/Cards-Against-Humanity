@@ -145,23 +145,28 @@ body {
     overflow: auto;
 }
 
-.top-white-card-container {
-
+.card-container {
     height: auto;
     border: 2px solid black;
     border-radius: 10px;
     margin: 0.5%;
     position: relative;
+    box-sizing: border-box;
 }
 
-.single-card-container {
+.single {
     width: 12%;
     min-width: 170px;
 }
 
-.double-card-container {
+.double {
     width: 24%;
-    min-width: 310px;
+    min-width: 320px;
+}
+
+.triple {
+    width: 36%;
+    min-width: 510px;
 }
 
 .top-white-card {
@@ -174,12 +179,16 @@ body {
     top: 0;
 }
 
-.full-card {
+.single > .top-white-card {
     width: 100%;
 }
 
-.half-card {
+.double > .top-white-card {
     width: 50%;
+}
+
+.triple > .top-white-card {
+    width: 33.3%;
 }
 
 .left {
@@ -187,18 +196,30 @@ body {
 }
 
 .right {
+    margin-left: 66.6%;
+}
+
+.triple > .mid {
+    margin-left: 33.3%;
+}
+
+.double > .mid {
     margin-left: 50%;
 }
 
-.double-card-container:before {
+.double:before {
     padding-top: 60%;
 }
 
-.single-card-container:before {
+.single:before {
     padding-top: 120%;
 }
 
-.top-white-card-container:before {
+.triple:before {
+    padding-top: 40%;
+}
+
+.card-container:before {
     content: "";
     display: block;
 }

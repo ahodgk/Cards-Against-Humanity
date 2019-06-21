@@ -53,7 +53,7 @@ socket.on('receive full game state', function (data) {
     console.log(gameState)
     updatePlayersList();
 
-    if(gameState.playState == 1) {
+    if (gameState.playState == 1) {
         updateBlackCard();
     }
 
@@ -71,28 +71,41 @@ socket.on('receive full game state', function (data) {
     }
 })
 
-// todo display top cards - WIP
+let containerData = [{containerClassSize: "single"}, {containerClassSize: "double"}, {containerClassSize: "triple"}] // index = cards per container
+
 function showTopCards() {
     if (!(gameState.playState == 2 || gameState.playState == 3)) {
         return;
     }
+    let output = "";
+
     let tempCards = gameState.playStateInfo.topCards;
 
+    let containerSize = tempCards[0].cards.length;
+    let contData = containerData[containerSize];
 
-    //todo integrate multiple card plays
+    for (let i = 0; i < tempCards.length; i++) { // for each players cards
+        output += "<div class=\"" + contData.containerClassSize + " card-container\">"
+        for (let j = 0; j < tempCards[i].length; j++) { // for each specific card
+            let cardIndent;
+            if (j == 0) cardIndent = "left";
+            if (j == 1) cardIndent = "mid";
+            if (j == 2) cardIndent = "right";
+            output += "<div class=\"top-white-card " + cardIndent + "\"><p id=\"top-white-card-container" + i + "-card" + j + "\" class=\"white-card-text\">\n" +
+                tempCards[i].cards[j].cardText + "</p></div>"
+        }
 
+        output += "</div>"
+    }
 }
-
-// todo display black card
-
 function updateBlackCard() {
-    let blackCard =  gameState.playStateInfo.blackCard;
+    let blackCard = gameState.playStateInfo.blackCard;
     document.getElementById("black-card-text").innerText = blackCard.cardText;
 }
 
 
 // todo click top cards
-// todo czar notice
+// todo czar notice !!!
 socket.on('receive bottom cards', function (data) {
     bottomCardsData = data;
     updateBottomCards();
