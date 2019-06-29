@@ -86,8 +86,8 @@ function showTopCards() {
     let contData = containerData[containerSize];
 
     for (let i = 0; i < tempCards.length; i++) { // for each players cards
-        output += "<div class=\"" + contData.containerClassSize + " card-container\">"
-        for (let j = 0; j < tempCards[i].length; j++) { // for each specific card
+        output += "<div class=\"" + contData.containerClassSize + " card-container\" id='card-container-"+i+"'>"
+        for (let j = 0; j < tempCards[i].cards.length; j++) { // for each specific card
             let cardIndent;
             if (j == 0) cardIndent = "left";
             if (j == 1) cardIndent = "mid";
@@ -142,7 +142,7 @@ function confirmCardChoice() {
 
 function selectCard(card) {
     console.log(card);
-    selectedCardNo = parseInt(card.id[5]);
+    selectedCardNo = parseInt(card.id[5]); // 5 is position in string of number
 
 }
 
