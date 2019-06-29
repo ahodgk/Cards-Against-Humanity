@@ -146,9 +146,9 @@ function chooseCard(data) {
     // doing shit
 
     let card = game.players[indexOfPlayer].cards[data.cardIndex];
-    game.players[indexOfPlayer].playedCards.push(card);
+    game.players[indexOfPlayer].playedCards.push(card); // adds to their list of played cards
 
-    game.players[indexOfPlayer].cards.splice(data.cardIndex, 1);
+    game.players[indexOfPlayer].cards.splice(data.cardIndex, 1); // removes from their deck
 
     let allComplete = true;
     for (let i = 0; i < game.players.length; i++) {
@@ -237,12 +237,11 @@ function nextGameState(gameId) { // TODO add a timer for each state
 
         let object = [];
 
-        for (let i = 0; i < game.players.length; i++) {
-            if (i == game.playStateInfo.czarIndex) continue;
-            let container = {};
-            object.push({cards: game.players[i].playedCards, playerIndex: i})
+        for (let i = 0; i < game.players.length; i++) { // for each player
+            if (i == game.playStateInfo.czarIndex) continue; // if they are czar
+            object.push({cards: game.players[i].playedCards, playerIndex: i}) // adds an object containing: 1) a list of their cards 2) their player index
         }
-        shuffle(object); // so order is unkown, only happens on state change
+        shuffle(object); // so order is unknown, only happens on state change
 
         game.playStateInfo.topCards = object;
     }
@@ -507,7 +506,7 @@ function createGame(data) {
     let gameIds = Object.keys(gamesInProgress);
     let gId = null;
     while (gId == null || gameIds.indexOf(gId) != -1) {
-        gId = makeId(6, "GID:")
+        gId = makeId(6, "GID")
     }
 
     logData("game '" + gameName + "' created by session '" + creator + "'");
@@ -545,7 +544,7 @@ function newPlayer(data) {
     let newSessionID = null;
     let sessionIds = Object.keys(connectedSessions);
     while (newSessionID == null || sessionIds.indexOf(newSessionID) != -1) { // to make sure its unique
-        newSessionID = makeId(ID_LENGTH, "SID:"); // generates server-session id
+        newSessionID = makeId(ID_LENGTH, "SID"); // generates server-session id
     }
     emitToSocket(this.id, 'newSessionID', newSessionID); // sends the client its id
     // connectedSessionIDs.push(newSessionID);
