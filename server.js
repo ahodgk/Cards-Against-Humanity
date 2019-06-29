@@ -179,7 +179,7 @@ function kickPlayer(data) {
     //playerLeaveGame(data)
     let sessionToKick = game.players[data.index].sessionID;
     removePlayerFromGame(data.gameId, sessionToKick);
-    io.sockets.connected[connectedSessions[sessionToKick].socketID].emit('game left');
+    emitToSocket(connectedSessions[sessionToKick].socketID, 'game left');
     console.log("removed")
 }
 
@@ -228,7 +228,7 @@ function nextGameState(gameId) { // TODO add a timer for each state
             game.playStateInfo.czarIndex = 0;
         }
         game.playStateInfo.czarSession = game.players[game.playStateInfo.czarIndex].sessionID;
-        io.sockets.connected[connectedSessions[game.playStateInfo.czarSession].socketID].emit("client is czar");
+        emitToSocket(connectedSessions[game.playStateInfo.czarSession].socketID, "client is czar");
 
 
         dealCards(gameId);
@@ -279,7 +279,7 @@ function playerLeaveGame(data) {
     console.log("session valid")
     removePlayerFromGame(data.gameId, data.session);
     console.log("removed on server")
-    io.sockets.connected[this.id].emit('game left');
+    emitToSocket(this.id, 'game left');
     console.log("client updates")
 }
 
@@ -306,7 +306,7 @@ function userConnected(data) {
     let game = gamesInProgress[data.gameId];
 
     if (game == null) {
-        io.sockets.connected[this.id].emit('game not found');
+        emitToSocket(this.id, 'game not found');
         return;
     }
 
@@ -319,7 +319,7 @@ function userConnected(data) {
     }
 
     if (game.players.length >= 9 && !exists) { // only checks if game is full if they are a new player
-        io.sockets.connected[this.id].emit('game is full');
+        emitToSocket(this.id, 'game is full');
         return;
     }
 
@@ -351,7 +351,7 @@ function userConnected(data) {
 
     sendGamePlayersFullState(data.gameId);
     if (game.creatorSessionID == data.session) {
-        io.sockets.connected[this.id].emit('is creator');
+        emitToSocket(this.id, 'is creator');
     }
 
 }
@@ -399,22 +399,22 @@ function sendGamePlayersFullState(gameId) {
     // console.log(fullGameState)
     for (let i = 0; i < gamesInProgress[gameId].players.length; i++) {
         let socketId = connectedSessions[gamesInProgress[gameId].players[i].sessionID].socketID;
-        io.sockets.connected[socketId].emit('receive full game state', fullGameState);
+        emitToSocket(socketId, 'receive full game state', fullGameState);
         if (fullGameState.playStateInfo.czarIndex == i) {
-            io.sockets.connected[socketId].emit('client is czar');
+            emitToSocket(socketId, 'client is czar');
         }
 
         if (gamesInProgress[gameId].players[i].cards.length < 1) {
             continue;
         }
-        io.sockets.connected[socketId].emit('receive bottom cards', gamesInProgress[gameId].players[i].cards);
+        emitToSocket(socketId, 'receive bottom cards', gamesInProgress[gameId].players[i].cards)
     }
 }
 
 function deleteGame(gameId) {
 
     for (let i = 0; i < gamesInProgress[gameId].players.length; i++) {
-        io.sockets.connected[connectedSessions[gamesInProgress[gameId].players[i].sessionID].socketID].emit('game left'); // notifys client
+        emitToSocket(connectedSessions[gamesInProgress[gameId].players[i].sessionID].socketID, 'game left'); // notify client
     }
     delete gamesInProgress[gameId];
     logData("Creator in game '" + gameId + "' left. Deleting.");
@@ -459,7 +459,7 @@ function logOutUser(session, socket) {
         }
     }
     delete connectedSessions[session];
-    io.sockets.connected[socket].emit('logged out');
+    emitToSocket(socket, 'logged out');
     logData("logged out session: " + session)
 }
 
@@ -480,7 +480,7 @@ function sendGameList(sessionID) {
     if (connectedSessions[sessionID] == null) {
         return;
     }
-    io.sockets.connected[connectedSessions[sessionID].socketID].emit('receive game list', returnObject);
+    emitToSocket(connectedSessions[sessionID].socketID, 'receive game list', returnObject)
 }
 
 function userJoinGame(data) { // when request to join game through game list
@@ -496,7 +496,7 @@ function userJoinGame(data) { // when request to join game through game list
     if (game.players.length >= 9) {
         return;
     }
-    io.sockets.connected[connectedSessions[userSession].socketID].emit('connect user to game', gameId); // game data is updated once browser connects
+    emitToSocket(connectedSessions[userSession].socketID, 'connect user to game', gameId) // game data is updated once browser connects
 
 }
 
@@ -525,18 +525,18 @@ function createGame(data) {
 
     };
     gamesInProgress[gId] = game;
-    io.sockets.connected[connectedSessions[creator].socketID].emit('connect user to game', gId);
+    emitToSocket(connectedSessions[creator].socketID, 'connect user to game', gId)
 }
 
 function returningPlayer(data) {
     let returnSessionID = data; // gets the session id given by client
     if (connectedSessions[returnSessionID] == null) {
-        io.sockets.connected[this.id].emit('session not found');
+        emitToSocket(this.id, 'session not found');
         return;
     }
     connectedSessions[returnSessionID].socketID = this.id; // updates the sessions socket id
     logData(this.id + " connected as " + connectedSessions[returnSessionID].username + " with sessionID: " + returnSessionID); // logs to console
-    io.sockets.connected[this.id].emit('get username', connectedSessions[returnSessionID].username);
+    emitToSocket(this.id, 'get username', connectedSessions[returnSessionID].username);
     connectedSessions[returnSessionID].lastSeen = Date.now();
 }
 
@@ -547,7 +547,7 @@ function newPlayer(data) {
     while (newSessionID == null || sessionIds.indexOf(newSessionID) != -1) { // to make sure its unique
         newSessionID = makeId(ID_LENGTH, "SID:"); // generates server-session id
     }
-    io.sockets.connected[this.id].emit('newSessionID', newSessionID); // sends the client its id
+    emitToSocket(this.id, 'newSessionID', newSessionID); // sends the client its id
     // connectedSessionIDs.push(newSessionID);
     let time = Date.now();
     if (data == "£kR8Qv^PrpDxv!q") {
@@ -568,6 +568,26 @@ function makeId(length, prefix) {
 
 function logData(message) {
     console.log("\x1b[33m%s\x1b[0m", message);
+}
+
+function consoleLog(type, message) {
+    console.log("<" + type + "> " + message);
+}
+
+function logToPlayer(type, message, session) {
+    let socket = connectedSessions[session].socketID;
+    message = "<" + type + "> " + message;
+    emitToSocket(socket, 'message', message)
+}
+
+function emitToSocket(socket, destination, data) {
+    try {
+        io.sockets.connected[socket].emit(destination, data);
+        return true;
+    } catch (exception) {
+        consoleLog("ERROR", exception);
+        return false;
+    }
 }
 
 process.stdin.resume();

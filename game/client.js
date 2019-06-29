@@ -19,6 +19,7 @@ var selectedCardNo;
 var socket = io();
 socket.on('message', function (data) {
     console.log(data);
+    // TODO add to on screen logs
 })
 
 socket.on('get username', function (data) { // fires if the server accepts them as a returning player
