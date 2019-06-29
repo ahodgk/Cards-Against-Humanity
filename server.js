@@ -507,8 +507,9 @@ function createGame(data) {
     let gameIds = Object.keys(gamesInProgress);
     let gId = null;
     while (gId == null || gameIds.indexOf(gId) != -1) {
-        gId = Math.floor(Math.random() * 1000);
+        gId = makeId(6, "GID:")
     }
+
     logData("game '" + gameName + "' created by session '" + creator + "'");
     logData("Current session: " + connectedSessions[creator]);
     let game = {
@@ -544,7 +545,7 @@ function newPlayer(data) {
     let newSessionID = null;
     let sessionIds = Object.keys(connectedSessions);
     while (newSessionID == null || sessionIds.indexOf(newSessionID) != -1) { // to make sure its unique
-        newSessionID = makeId(ID_LENGTH); // generates server-session id
+        newSessionID = makeId(ID_LENGTH, "SID:"); // generates server-session id
     }
     io.sockets.connected[this.id].emit('newSessionID', newSessionID); // sends the client its id
     // connectedSessionIDs.push(newSessionID);
@@ -555,8 +556,8 @@ function newPlayer(data) {
     connectedSessions[newSessionID] = {sessionID: newSessionID, socketID: this.id, username: data, lastSeen: time}; // saves to list of session ids
 }
 
-function makeId(length) {
-    var text = "";
+function makeId(length, prefix) {
+    var text = prefix;
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     for (var i = 0; i < length; i++)
