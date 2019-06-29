@@ -72,14 +72,14 @@ server.listen(PORT, function () {
 var connectedSessions = {};
 var gamesInProgress = {};
 
-setInterval(function () {
+setInterval(function () { // checks for afk people
     let time = Date.now();
     let cutOff = time - PURGE_TIMEOUT;
 
     let keys = Object.keys(connectedSessions);
     for (let i = 0; i < keys.length; i++) {
         if (connectedSessions[keys[i]].lastSeen < cutOff) {
-            logOutUser(keys[i]);
+            logOutUser(keys[i], connectedSessions[keys[i]].socketID);
         }
     }
 }, 1200 * 1000);
