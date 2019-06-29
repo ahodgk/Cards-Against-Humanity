@@ -105,7 +105,6 @@ function updateBlackCard() {
 
 
 // todo click top cards
-// todo czar notice !!! - show on reset
 socket.on('receive bottom cards', function (data) {
     bottomCardsData = data;
     updateBottomCards();
