@@ -63,7 +63,7 @@ app.get('/', function (request, response) {
 // Starts server
 server.listen(PORT, function () {
     console.log(__dirname);
-    console.log('\x1b[32mStarting  server on port 5000\x1b[0m');
+    console.log('\x1b[32mStarting  server on port ' + PORT + '\x1b[0m');
     getWhiteCardsJSON();
     getBlackCardsJSON();
 });
@@ -110,7 +110,9 @@ io.on('connection', function (socket) { // when a connection is recieved
 
     socket.on('kick player from game', kickPlayer);
 
-    socket.on('choose card', chooseCard)
+    socket.on('choose card', chooseCard);
+
+    socket.on('czar choose card', czarChooseCard);
 });
 
 function chooseCard(data) {
@@ -126,7 +128,7 @@ function chooseCard(data) {
 
     let indexOfPlayer = null;
     for (let i = 0; i < game.players.length; i++) { // find player index
-        if (game.players[i].sessionID = data.session) {
+        if (game.players[i].sessionID == data.session) {
             indexOfPlayer = i;
             break;
         }
@@ -135,6 +137,7 @@ function chooseCard(data) {
         return;
     }
     if (indexOfPlayer == game.playStateInfo.czarIndex) { // if player is czar
+        consoleLog("WARNING", "Czar tried to play card")
         return;
     }
     if (game.players[indexOfPlayer].playedCards == null) {
@@ -144,14 +147,25 @@ function chooseCard(data) {
         return;
     }
     // doing shit
-
     let card = game.players[indexOfPlayer].cards[data.cardIndex];
+    consoleLog("INFO", "Player played card " + card.cardText)
     game.players[indexOfPlayer].playedCards.push(card); // adds to their list of played cards
 
     game.players[indexOfPlayer].cards.splice(data.cardIndex, 1); // removes from their deck
+    if (game.players[indexOfPlayer].playedCards.length == game.playStateInfo.cardsToChoose) {
+        console.log("Player has finished cards")
+        game.players[indexOfPlayer].waiting = false;
+        let tempCardObj = [];
+        for (let i = 0; i < game.playStateInfo.cardsToChoose; i++) {
+            tempCardObj.push({cardText: "", index: -1})
+        }
+        game.playStateInfo.topCards.push({cards: tempCardObj, playerIndex: -1});
 
+    }
+    sendGamePlayersFullState(data.gameId);
     let allComplete = true;
     for (let i = 0; i < game.players.length; i++) {
+        if (i == game.playStateInfo.czarIndex) continue;
         if (game.players[i].playedCards.length < game.playStateInfo.cardsToChoose) {
             allComplete = false;
         }
@@ -159,6 +173,47 @@ function chooseCard(data) {
     if (allComplete) {
         nextGameState(data.gameId);
     }
+}
+
+function czarChooseCard(data) {
+    // validation
+    if (!validateSession(data.session, this.id)) return;
+    let game = gamesInProgress[data.gameId];
+    if (game.interim) return;
+    if (game == null) { // if game no exist
+        return;
+    }
+    if (game.playState != 2) { // if game isnt in choosing state
+        return;
+    }
+
+    let indexOfPlayer = null;
+    for (let i = 0; i < game.players.length; i++) { // find player index
+        if (game.players[i].sessionID == data.session) {
+            indexOfPlayer = i;
+            break;
+        }
+    }
+    if (indexOfPlayer == null) { // if player not exist
+        return;
+    }
+    if (indexOfPlayer != game.playStateInfo.czarIndex) { // if player is czar
+        consoleLog("WARNING", "Player tried to czar");
+        return;
+    }
+
+    let playerIndex = game.playStateInfo.topCards[data.cardIndex].playerIndex;
+    game.players[playerIndex].points++;
+    for (let i = 0; i < game.players.length; i++) {
+        emitToSocket(connectedSessions[game.players[i].sessionID].socketID, "winningCard", data.cardIndex);
+    }
+    sendGamePlayersFullState(data.gameId)
+    game.interim = true;
+
+    setTimeout(function () {
+        consoleLog("INFO", "Changing state");
+        nextGameState(data.gameId);
+    }, 8000);
 }
 
 function kickPlayer(data) {
@@ -208,11 +263,14 @@ function dealCards(gameId) {
 
 function nextGameState(gameId) { // TODO add a timer for each state
     let game = gamesInProgress[gameId];
+    game.interim = false;
     game.playState += 1;
-    if (game.playState > 3) {
+    if (game.playState > 2) {
         game.playState = 1;
     }
     if (game.playState == 1) { // players choose cards
+        game.playStateInfo.topCards = [];
+
         // todo AHHHHHHHHHHHHHHHHHHHH
         // get a black card
         let card = getRandomBlackCard(); // {index: cardIndex, cardText: blackCards[cardIndex].text, rule: pick}
@@ -226,6 +284,11 @@ function nextGameState(gameId) { // TODO add a timer for each state
         game.playStateInfo.czarIndex++;
         if (game.playStateInfo.czarIndex >= game.players.length) {
             game.playStateInfo.czarIndex = 0;
+        }
+
+        for (let i = 0; i < game.players.length; i++) {
+            game.players[i].isCzar = (i == game.playStateInfo.czarIndex);
+            game.players[i].waiting = true;
         }
         game.playStateInfo.czarSession = game.players[game.playStateInfo.czarIndex].sessionID;
         emitToSocket(connectedSessions[game.playStateInfo.czarSession].socketID, "client is czar");
@@ -301,13 +364,14 @@ function getRandomBlackCard() {
 }
 
 function userConnected(data) {
-    if (!validateSession(data.session, this.id)) return;
     let game = gamesInProgress[data.gameId];
 
     if (game == null) {
         emitToSocket(this.id, 'game not found');
         return;
     }
+
+    if (!validateSession(data.session, this.id)) return;
 
     // this checks if the user is already in the game
     let exists = false;
@@ -341,7 +405,8 @@ function userConnected(data) {
             sessionID: data.session,
             username: connectedSessions[data.session].username,
             points: 0,
-            cards: [] // contains object with card's index in whiteCardsJSON, and the text on the card so is in cached for easier use
+            cards: [], // contains object with card's index in whiteCardsJSON, and the text on the card so is in cached for easier use
+            playedCards: []
         });
     }
     if (game.playState != 0) {
@@ -363,7 +428,9 @@ function getFullGameState(gameId) { // TODO split this into several function for
     for (let i = 0; i < game.players.length; i++) {
         let playerData = {
             username: game.players[i].username,
-            points: game.players[i].points /*, cards:game.players[i].cards*/
+            points: game.players[i].points, /*, cards:game.players[i].cards*/
+            waiting: game.players[i].waiting,
+            isCzar: game.players[i].isCzar
         };
         gamePlayers.push(playerData);
     }
@@ -401,6 +468,8 @@ function sendGamePlayersFullState(gameId) {
         emitToSocket(socketId, 'receive full game state', fullGameState);
         if (fullGameState.playStateInfo.czarIndex == i) {
             emitToSocket(socketId, 'client is czar');
+        } else {
+            emitToSocket(socketId, 'client not czar');
         }
 
         if (gamesInProgress[gameId].players[i].cards.length < 1) {
@@ -570,7 +639,11 @@ function logData(message) {
 }
 
 function consoleLog(type, message) {
-    console.log("<" + type + "> " + message);
+    try {
+        console.log("<" + type + "> " + message);
+    } catch (e) {
+        console.log(e);
+    }
 }
 
 function logToPlayer(type, message, session) {

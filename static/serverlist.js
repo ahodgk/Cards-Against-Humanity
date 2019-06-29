@@ -39,7 +39,7 @@ socket.on('receive game list', function (data) {
             "                <p class=\"playersInGame infoChunk\"><b>Players:</b> " + lobby.numberPlayers + "/9</p>\n" +
             "            </div>\n" +
             "            <div class=\"gameButtons\">\n" +
-            "                <button class=\"indButton\" onclick='requestJoinGame('" + lobby.id + "')'>Join Game</button>\n" +
+            "                <button class=\"indButton\" onclick='requestJoinGame(\"" + lobby.id + "\")'>Join Game</button>\n" +
             "            </div>\n" +
             "        </div>";
         htmlOut += box;

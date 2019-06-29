@@ -49,18 +49,44 @@ socket.on('game is full', function () {
     window.location.href = "../static/serverlist.html";
 })
 
+socket.on("winningCard", function (data) {
+    for (let i = 0; i < gameState.playStateInfo.topCards[data].cards.length; i++) {
+        console.log("card changed")
+        winningCardIds[i] = "top-white-card-container" + data + "-card" + i;
+        document.getElementById(winningCardIds[i]).className = "white-card-text winningCard";
+    }
+})
+
+function showWinningCards() {
+    console.log(winningCardIds)
+    for (let i = 0; i < winningCardIds.length; i++) {
+        console.log("card changed")
+        document.getElementById(winningCardIds[i]).className = "white-card-text winningCard";
+    }
+}
+
+let winningCardIds = [];
+
 socket.on('receive full game state', function (data) {
+    console.log("received game state");
+
     gameState = data;
     console.log(gameState)
     updatePlayersList();
 
-    if (gameState.playState == 1) {
+    if(gameState.playState == 1) {
+        winningCardIds = [];
+    }
+
+    if (gameState.playState == 1 || gameState.playState == 2) {
         updateBlackCard();
     }
 
-    if (gameState.playState == 2) {
-        showTopCards();
-    }
+    //if (gameState.playState == 2) {
+    showTopCards();
+    /*} else {
+        document.getElementById("top-other-player-cards-container").innerHTML = "";
+    }*/
 
 
     if (creatorOptionsAdded) {
@@ -75,30 +101,42 @@ socket.on('receive full game state', function (data) {
 let containerData = [{containerClassSize: "single"}, {containerClassSize: "double"}, {containerClassSize: "triple"}] // index = cards per container
 
 function showTopCards() {
-    if (!(gameState.playState == 2 || gameState.playState == 3)) {
+    /*if (!(gameState.playState == 2 || gameState.playState == 3)) { // cards may show up blank to show they are played
         return;
-    }
+    }*/
+    console.log("Shwoing top cards");
     let output = "";
+    try {
+        let tempCards = gameState.playStateInfo.topCards;
+        console.log(tempCards)
+        if (tempCards[0] == null) {
+            document.getElementById("top-other-player-cards-container").innerHTML = "";
+            return;
+        }
+        let containerSize = tempCards[0].cards.length;
+        let contData = containerData[containerSize - 1];
 
-    let tempCards = gameState.playStateInfo.topCards;
+        for (let i = 0; i < tempCards.length; i++) { // for each players cards
+            output += "<div class=\"" + contData.containerClassSize + " card-container\" onclick=\"selectCard(this);\" id='card-container-" + i + "'>"
+            for (let j = 0; j < tempCards[i].cards.length; j++) { // for each specific card
+                let cardIndent;
+                if (j == 0) cardIndent = "left";
+                if (j == 1) cardIndent = "mid";
+                if (j == 2) cardIndent = "right";
+                output += "<div class=\"top-white-card " + cardIndent + "\"><p id=\"top-white-card-container" + i + "-card" + j + "\" class=\"white-card-text\">\n" +
+                    tempCards[i].cards[j].cardText + "</p></div>"
+            }
 
-    let containerSize = tempCards[0].cards.length;
-    let contData = containerData[containerSize];
-
-    for (let i = 0; i < tempCards.length; i++) { // for each players cards
-        output += "<div class=\"" + contData.containerClassSize + " card-container\" id='card-container-"+i+"'>"
-        for (let j = 0; j < tempCards[i].cards.length; j++) { // for each specific card
-            let cardIndent;
-            if (j == 0) cardIndent = "left";
-            if (j == 1) cardIndent = "mid";
-            if (j == 2) cardIndent = "right";
-            output += "<div class=\"top-white-card " + cardIndent + "\"><p id=\"top-white-card-container" + i + "-card" + j + "\" class=\"white-card-text\">\n" +
-                tempCards[i].cards[j].cardText + "</p></div>"
+            output += "</div>"
         }
 
-        output += "</div>"
+        document.getElementById("top-other-player-cards-container").innerHTML = output;
+        showWinningCards();
+    } catch (exception) {
+        console.log(exception);
     }
 }
+
 function updateBlackCard() {
     let blackCard = gameState.playStateInfo.blackCard;
     document.getElementById("black-card-text").innerText = blackCard.cardText;
@@ -128,7 +166,14 @@ function activateCzarMode(data) {
 
 }
 
+socket.on("client not czar", deactivateCzarMode);
+
+function deactivateCzarMode(data) {
+    document.getElementById("czar-notice").style.display = "none";
+}
+
 function updateBottomCards() {
+    console.log("Updating bottom cards");
     let text = "";
     for (var i = 0; i < bottomCardsData.length; i++) {
         text += '<button id="card-' + i + '" class="card" onclick="selectCard(this);"><p class="white-card-text">' + bottomCardsData[i].cardText + '</p></button>';
@@ -137,13 +182,34 @@ function updateBottomCards() {
 }
 
 function confirmCardChoice() {
-    socket.emit("choose card", {session: currentSessionID, gameId: gameState.gameId, cardIndex: selectedCardNo});
+    if (document.getElementById("czar-notice").style.display == "none") {
+        socket.emit("choose card", {session: currentSessionID, gameId: gameState.gameId, cardIndex: selectedCardNo});
+    } else if (document.getElementById("czar-notice").style.display != "none") {
+        console.log("confirmed")
+        socket.emit("czar choose card", {
+            session: currentSessionID,
+            gameId: gameState.gameId,
+            cardIndex: czarSelectedCards
+        });
+    }
 }
 
-function selectCard(card) {
-    console.log(card);
-    selectedCardNo = parseInt(card.id[5]); // 5 is position in string of number
+var czarSelectedCards;
 
+function selectCard(card) {
+    let hCard = document.getElementById(card.id);
+    console.log(hCard)
+    if (hCard.className == "card") {
+        if (document.getElementById("czar-notice").style.display != "none") return;
+        console.log(hCard);
+        console.log(hCard.id[5]);
+        selectedCardNo = parseInt(hCard.id[5]); // 5 is position in string of number }
+    } else if (hCard.className.toString().includes("container")) {
+        console.log("card selected")
+        if (document.getElementById("czar-notice").style.display == "none") return;
+        czarSelectedCards = parseInt(hCard.id[15]);
+
+    }
 }
 
 function startGame() {
@@ -243,8 +309,13 @@ function updatePlayersList() {
     let playersList = gameState.players;
     let string = "";
     for (let i = 0; i < playersList.length; i++) {
-        string += "<div class=\"player-list-item\"><p class=\"player-list-name\">" + playersList[i].username + "</p>\n" +
-            "                            <p class=\"player-list-points\">" + playersList[i].points + "</p></div>"
+        let pointsPrefix = "";
+        if(playersList[i].waiting) pointsPrefix = "Waiting ... ";
+        if(playersList[i].isCzar) pointsPrefix = "CZAR ... ";
+
+
+        string += "<div class=\"player-list-item\"><p class=\"player-list-name\">" + playersList[i].username+ "</p>\n" +
+            "                            <p class=\"player-list-points\">" + pointsPrefix + playersList[i].points + "</p></div>"
     }
 
     document.getElementById("list-of-players").innerHTML = string;
