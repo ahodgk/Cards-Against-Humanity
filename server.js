@@ -213,7 +213,7 @@ function czarChooseCard(data) {
     setTimeout(function () {
         consoleLog("INFO", "Changing state");
         nextGameState(data.gameId);
-    }, 8000);
+    }, 5000);
 }
 
 function kickPlayer(data) {
