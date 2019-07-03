@@ -598,7 +598,8 @@ function createGame(data) {
 
 function returningPlayer(data) {
     let returnSessionID = data; // gets the session id given by client
-    if (!connectedSessions.keys().includes(returnSessionID)) {
+    let user = connectionSessions[returnSessionID];
+    if (user == null) {
         emitToSocket(this.id, 'session not found');
         return;
     }
