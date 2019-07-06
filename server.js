@@ -79,6 +79,7 @@ setInterval(function () { // checks for afk people
     let keys = Object.keys(connectedSessions);
     for (let i = 0; i < keys.length; i++) {
         if (connectedSessions[keys[i]].lastSeen < cutOff) {
+            //addPlayerToRemoveQueue(connectedSessions[keys[i].socketID].currentGame, keys[i], "LOG OUT");
             logOutUser(keys[i], connectedSessions[keys[i]].socketID);
         }
     }
@@ -99,6 +100,7 @@ io.on('connection', function (socket) { // when a connection is recieved
 
     socket.on('log out', function (session) {
         if (!validateSession(session, this.id)) return;
+        //addPlayerToRemoveQueue()
         logOutUser(session, this.id);
     });
 
@@ -233,7 +235,8 @@ function kickPlayer(data) {
 
     //playerLeaveGame(data)
     let sessionToKick = game.players[data.index].sessionID;
-    removePlayerFromGame(data.gameId, sessionToKick);
+    //removePlayerFromGame(data.gameId, sessionToKick);
+    addPlayerToRemoveQueue(data.gameId, sessionToKick, "REMOVE");
     emitToSocket(connectedSessions[sessionToKick].socketID, 'game left');
     console.log("removed")
 }
@@ -269,6 +272,28 @@ function nextGameState(gameId) { // TODO add a timer for each state
         game.playState = 1;
     }
     if (game.playState == 1) { // players choose cards
+        clearInterval(game.roundTimer);
+
+        for (let i = 0; i < game.removeQueue.length; i++) {
+            switch (method.toUpperCase()) {
+                case "LOG OUT":
+                    //logOutUser(game.removeQueue[i].session, connectedSessions[game.removeQueue[i].session].socketID);
+
+                    removePlayerFromGame(gameId, game.removeQueue[i].session);
+                    delete connectedSessions[session];
+                    emitToSocket(socket, 'logged out');
+                    logData("logged out session: " + session)
+
+
+                    break;
+                case "REMOVE":
+                    removePlayerFromGame(game.gameId, game.removeQueue[i].session);
+                    break;
+            }
+
+            game.removeQueue.splice(i, 1);
+        }
+
         game.playStateInfo.topCards = [];
 
         // todo AHHHHHHHHHHHHHHHHHHHH
@@ -295,8 +320,14 @@ function nextGameState(gameId) { // TODO add a timer for each state
 
 
         dealCards(gameId);
+
+        game.roundTimer = setInterval(function(){
+            // todo allow state to progress without error
+        }, 60000)
     } else if (game.playState == 2) { // czar picks / choosing state
         // creating an object to store the top cards
+
+        clearInterval(game.roundTimer);
 
         let object = [];
 
@@ -307,6 +338,10 @@ function nextGameState(gameId) { // TODO add a timer for each state
         shuffle(object); // so order is unknown, only happens on state change
 
         game.playStateInfo.topCards = object;
+
+        game.roundTimer = setInterval(function(){
+            // todo allow state to progress without error
+        }, 60000)
     }
 
     sendGamePlayersFullState(gameId)
@@ -339,7 +374,8 @@ function startGame(data) {
 function playerLeaveGame(data) {
     if (!validateSession(data.session, this.id)) return;
     console.log("session valid")
-    removePlayerFromGame(data.gameId, data.session);
+    //removePlayerFromGame(data.gameId, data.session);
+    addPlayerToRemoveQueue(data.gameId, data.session, "REMOVE")
     console.log("removed on server")
     emitToSocket(this.id, 'game left');
     console.log("client updates")
@@ -395,7 +431,8 @@ function userConnected(data) {
 
     //if()
     if (connectedSessions[data.session].currentGame != data.gameId) {
-        removePlayerFromGame(connectedSessions[data.session].currentGame, data.session);
+        addPlayerToRemoveQueue(connectedSessions[data.session].currentGame, data.session, "REMOVE");
+        //removePlayerFromGame(connectedSessions[data.session].currentGame, data.session);
     }
     connectedSessions[data.session].currentGame = data.gameId;
 
@@ -511,8 +548,10 @@ function removePlayerFromGame(gameId, session) {
             }
         }
     }
+}
 
-
+function addPlayerToRemoveQueue(gameId, session, method) {
+    gamesInProgress[gameId].removeQueue.push({session: session, gameId: gameId, method: method});
 }
 
 function logOutUser(session, socket) {
@@ -521,12 +560,13 @@ function logOutUser(session, socket) {
 
         for (let j = 0; j < gamesInProgress[gameIds[i]].players.length; j++) { // for each player in that game
             if (gamesInProgress[gameIds[i]].players[j].sessionID == session) { // if that player is the one logging out
-                removePlayerFromGame(gamesInProgress[gameIds[i]].gameId, session); // remove them from the game
+                addPlayerToRemoveQueue(gamesInProgress[gameIds[i]].gameId, session, "LOG OUT");
+                //removePlayerFromGame(gamesInProgress[gameIds[i]].gameId, session); // remove them from the game
                 break; // because condition cant be evaluated if the only player gets removed and deletes the game
             }
         }
     }
-    delete connectedSessions[session];
+    //delete connectedSessions[session];
     emitToSocket(socket, 'logged out');
     logData("logged out session: " + session)
 }
@@ -589,7 +629,9 @@ function createGame(data) {
         round: 0,
         pointsGoal: 12,
         playState: 0, // 0 - not started, 1 - players are choosing cards, 2 - czar is choosing cards, 3 - time betweeen
-        playStateInfo: {czarIndex: -1} // stores info about cards played and whatnot - specific state of round
+        playStateInfo: {czarIndex: -1}, // stores info about cards played and whatnot - specific state of round
+        removeQueue: [],
+        roundTimer: null
 
     };
     gamesInProgress[gId] = game;
