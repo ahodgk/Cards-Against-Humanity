@@ -551,6 +551,7 @@ function removePlayerFromGame(gameId, session) {
 }
 
 function addPlayerToRemoveQueue(gameId, session, method) {
+    console.log("Add player to remove queue SESSION: " + session + " GAME: " + gameId + " METHOD: " + method);
     gamesInProgress[gameId].removeQueue.push({session: session, gameId: gameId, method: method});
 }
 
