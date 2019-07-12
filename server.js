@@ -344,7 +344,7 @@ function nextGameState(gameId) { // TODO add a timer for each state
         }, 60000)
     }
 
-    sendGamePlayersFullState(gameId)
+    sendGamePlayersFullState(gameId);
 }
 
 function startGame(data) {
