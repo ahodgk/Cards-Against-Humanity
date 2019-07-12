@@ -4,7 +4,7 @@
   "description": "cards against humanity",
   "main": "./",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Error: no test specified\"",
     "start": "node server.js"
   },
   "author": "",
