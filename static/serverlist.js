@@ -11,6 +11,7 @@
  * Last modified 13/07/19 21:50                                               *
  ******************************************************************************/
 
+
 let currentSessionID = getCookie("currentSessionID");
 if (currentSessionID == "") {
     window.location.href = "../";
