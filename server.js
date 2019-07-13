@@ -274,6 +274,7 @@ function nextGameState(gameId) { // TODO add a timer for each state
     if (game.playState == 1) { // players choose cards
         clearInterval(game.roundTimer);
 
+        // remove players at a safe time
         for (let i = 0; i < game.removeQueue.length; i++) {
             switch (method.toUpperCase()) {
                 case "LOG OUT":
@@ -321,8 +322,16 @@ function nextGameState(gameId) { // TODO add a timer for each state
 
         dealCards(gameId);
 
+        game.roundTimerStart = Date.now();
         game.roundTimer = setInterval(function(){
             // todo allow state to progress without error
+            // todo add player visisble logs
+            // this should just move on an play with whoever has allready played
+
+            // remove incomplete card plays
+
+
+            nextGameState(gameId);
         }, 60000);
     } else if (game.playState == 2) { // czar picks / choosing state
         // creating an object to store the top cards
@@ -333,6 +342,7 @@ function nextGameState(gameId) { // TODO add a timer for each state
 
         for (let i = 0; i < game.players.length; i++) { // for each player
             if (i == game.playStateInfo.czarIndex) continue; // if they are czar
+            if(game.players[i].playedCards.length != game.playStateInfo.cardsToChoose) continue; // skips adding them to top cards as they have not finished - they will lose their cards
             object.push({cards: game.players[i].playedCards, playerIndex: i}) // adds an object containing: 1) a list of their cards 2) their player index
         }
         shuffle(object); // so order is unknown, only happens on state change
@@ -341,6 +351,9 @@ function nextGameState(gameId) { // TODO add a timer for each state
 
         game.roundTimer = setInterval(function(){
             // todo allow state to progress without error
+            // todo add player visisble logs
+            // this should just skip the round - nobody gets points
+            nextGameState(gameId);
         }, 60000);
     }
 
