@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2019.
  * Developed by Adam Hodgkinson
- * Last modified 13/07/19 22:57
+ * Last modified 13/07/19 23:08
  ******************************************************************************/
 
 
 // Config
-const MAX_PLAYERS = 9; }
+const MAX_PLAYERS = 9;
 const ID_LENGTH = 12;
 const NUMBER_OF_CARDS = 7;
 const PURGE_TIMEOUT = 1800 * 1000; // seconds, 30mins x 1000 as its calc in ms
