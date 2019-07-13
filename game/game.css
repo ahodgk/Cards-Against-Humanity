@@ -1,3 +1,9 @@
+/*******************************************************************************
+ * Copyright (c) 2019.
+ * Developed by Adam Hodgkinson
+ * Last modified 13/07/19 22:33
+ ******************************************************************************/
+
 html {
     margin: 0;
     height: 100%;
@@ -39,6 +45,11 @@ body {
 
 .push-right {
     margin-left: auto;
+}
+
+.time-left {
+    font-family: "Montserrat", sans-serif;
+    color: white;
 }
 
 .main-content {

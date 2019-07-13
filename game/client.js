@@ -1,7 +1,7 @@
-/******************************************************************************
- * Copyright (c) 2019.                                                        *
- * Developed by Adam Hodgkinson                                               *
- * Last modified 13/07/19 21:55                                               *
+/*******************************************************************************
+ * Copyright (c) 2019.
+ * Developed by Adam Hodgkinson
+ * Last modified 13/07/19 22:40
  ******************************************************************************/
 
 
@@ -21,6 +21,9 @@ const GAME_ID = $_GET['gameId'];
 var gameState = {};
 var bottomCardsData;
 var selectedCardNo;
+
+var roundTimeLeft = 0;
+var roundTimeInterval = null;
 
 
 var socket = io();
@@ -81,13 +84,13 @@ socket.on('receive full game state', function (data) {
     console.log(gameState)
     updatePlayersList();
 
-    if(gameState.playState == 1) {
+    if (gameState.playState == 1) {
         winningCardIds = [];
     }
 
     if (gameState.playState != 0) {
         updateBlackCard();
-
+        updateRoundTimer();
     }
 
     //if (gameState.playState == 2) {
@@ -105,6 +108,23 @@ socket.on('receive full game state', function (data) {
         addCreatorOptions();
     }
 })
+
+function updateRoundTimer() {
+    try {
+        clearInterval(roundTimeInterval);
+    } catch (e) {
+        console.log(e)
+    }
+
+    roundTimeInterval = setInterval(function () {
+        let endTime = gameState.roundTimerStart + 60000;
+        let timeLeft = Math.floor((endTime - Date.now()) / 1000);
+
+        document.getElementById("round-timer").innerText = "Time Left: " + timeLeft + "s";
+
+    }, 1000)
+
+}
 
 let containerData = [{containerClassSize: "single"}, {containerClassSize: "double"}, {containerClassSize: "triple"}] // index = cards per container
 
@@ -191,7 +211,11 @@ function updateBottomCards() {
 
 function confirmCardChoice() {
     if (document.getElementById("czar-notice").style.display == "none") {
-        socket.emit("choose card", {session: currentSessionID, gameId: gameState.gameId, cardIndex: selectedCardNo});
+        socket.emit("choose card", {
+            session: currentSessionID,
+            gameId: gameState.gameId,
+            cardIndex: selectedCardNo
+        });
     } else if (document.getElementById("czar-notice").style.display != "none") {
         console.log("confirmed")
         socket.emit("czar choose card", {
@@ -296,6 +320,7 @@ function addCreatorOptions() {
         "\n" +
         "        <div class=\"push-right\"></div>\n" +
         "\n" +
+        "        <p class=\"right-button time-left\" id=\"round-timer\">Time Left: 60s</p>" +
         "        <button class=\"top-buttons right-button\" onclick=\"showGameConfig();\">Game Config</button>\n" +
         "        <button class=\"top-buttons right-button\" onclick=\"logOut()\">Log out</button>"
 
@@ -318,11 +343,11 @@ function updatePlayersList() {
     let string = "";
     for (let i = 0; i < playersList.length; i++) {
         let pointsPrefix = "";
-        if(playersList[i].waiting) pointsPrefix = "Waiting ... ";
-        if(playersList[i].isCzar) pointsPrefix = "CZAR ... ";
+        if (playersList[i].waiting) pointsPrefix = "Waiting ... ";
+        if (playersList[i].isCzar) pointsPrefix = "CZAR ... ";
 
 
-        string += "<div class=\"player-list-item\"><p class=\"player-list-name\">" + playersList[i].username+ "</p>\n" +
+        string += "<div class=\"player-list-item\"><p class=\"player-list-name\">" + playersList[i].username + "</p>\n" +
             "                            <p class=\"player-list-points\">" + pointsPrefix + playersList[i].points + "</p></div>"
     }
 
