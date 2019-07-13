@@ -1,3 +1,16 @@
+
+/******************************************************************************
+ * Copyright (c) 2019.                                                        *
+ * Developed by Adam Hodgkinson                                               *
+ * Last modified 13/07/19 21:48                                               *
+ ******************************************************************************/
+
+/******************************************************************************
+ * Copyright (c) 2019.                                                        *
+ * Developed by Adam Hodgkinson                                               *
+ * Last modified 17/05/19 17:56                                               *
+ ******************************************************************************/
+
 let currentSessionID = getCookie("currentSessionID");
 if (currentSessionID != "" && currentSessionID != null) {
     window.location.href = "/static/serverlist.html";

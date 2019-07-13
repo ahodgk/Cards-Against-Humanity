@@ -1,3 +1,9 @@
+/******************************************************************************
+ * Copyright (c) 2019.                                                        *
+ * Developed by Adam Hodgkinson                                               *
+ * Last modified 13/07/19 21:46                                               *
+ ******************************************************************************/
+
 let currentSessionID = getCookie("currentSessionID");
 if (currentSessionID == "") {
     window.location.href = "../";
@@ -78,8 +84,9 @@ socket.on('receive full game state', function (data) {
         winningCardIds = [];
     }
 
-    if (gameState.playState == 1 || gameState.playState == 2) {
+    if (gameState.playState != 0) {
         updateBlackCard();
+
     }
 
     //if (gameState.playState == 2) {

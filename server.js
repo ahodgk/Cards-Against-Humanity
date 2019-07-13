@@ -1,3 +1,16 @@
+
+/******************************************************************************
+ * Copyright (c) 2019.                                                        *
+ * Developed by Adam Hodgkinson                                               *
+ * Last modified 13/07/19 21:48                                               *
+ ******************************************************************************/
+
+/******************************************************************************
+ * Copyright (c) 2019.                                                        *
+ * Developed by Adam Hodgkinson                                               *
+ * Last modified 13/07/19 21:38                                               *
+ ******************************************************************************/
+
 // Config
 const MAX_PLAYERS = 9;
 const ID_LENGTH = 12;
@@ -322,6 +335,7 @@ function nextGameState(gameId) { // TODO add a timer for each state
 
         dealCards(gameId);
 
+
         game.roundTimerStart = Date.now();
         game.roundTimer = setInterval(function(){
             // todo allow state to progress without error
@@ -349,6 +363,8 @@ function nextGameState(gameId) { // TODO add a timer for each state
 
         game.playStateInfo.topCards = object;
 
+
+        game.roundTimerStart = Date.now();
         game.roundTimer = setInterval(function(){
             // todo allow state to progress without error
             // todo add player visisble logs
@@ -645,7 +661,8 @@ function createGame(data) {
         playState: 0, // 0 - not started, 1 - players are choosing cards, 2 - czar is choosing cards, 3 - time betweeen
         playStateInfo: {czarIndex: -1}, // stores info about cards played and whatnot - specific state of round
         removeQueue: [],
-        roundTimer: null
+        roundTimer: null,
+        roundTimerStart: 0
 
     };
     gamesInProgress[gId] = game;
