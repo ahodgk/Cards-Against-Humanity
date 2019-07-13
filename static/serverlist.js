@@ -1,8 +1,7 @@
-
 /******************************************************************************
  * Copyright (c) 2019.                                                        *
  * Developed by Adam Hodgkinson                                               *
- * Last modified 13/07/19 21:54                                               *
+ * Last modified 13/07/19 21:56                                               *
  ******************************************************************************/
 
 /******************************************************************************
@@ -10,6 +9,8 @@
  * Developed by Adam Hodgkinson                                               *
  * Last modified 13/07/19 21:54                                               *
  ******************************************************************************/
+
+
 
 let currentSessionID = getCookie("currentSessionID");
 if (currentSessionID == "") {
@@ -102,5 +103,5 @@ function setCookie(cname, cvalue, exdays) {
 
 function getCookie(a) {
     const b = document.cookie.match('(^|;)\\s*' + a + '\\s*=\\s*([^;]+)');
-    return b ? b.pop() : '';
+    return b ? b.pop() : ''
 }
