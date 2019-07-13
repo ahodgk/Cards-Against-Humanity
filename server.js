@@ -341,7 +341,7 @@ function nextGameState(gameId) { // TODO add a timer for each state
 
         game.roundTimer = setInterval(function(){
             // todo allow state to progress without error
-        }, 60000)
+        }, 60000);
     }
 
     sendGamePlayersFullState(gameId);
