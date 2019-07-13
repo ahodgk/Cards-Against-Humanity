@@ -2,14 +2,15 @@
 /******************************************************************************
  * Copyright (c) 2019.                                                        *
  * Developed by Adam Hodgkinson                                               *
- * Last modified 13/07/19 21:48                                               *
+ * Last modified 13/07/19 21:49                                               *
  ******************************************************************************/
 
 /******************************************************************************
  * Copyright (c) 2019.                                                        *
  * Developed by Adam Hodgkinson                                               *
- * Last modified 17/05/19 17:56                                               *
+ * Last modified 13/07/19 21:48                                               *
  ******************************************************************************/
+
 
 let currentSessionID = getCookie("currentSessionID");
 if (currentSessionID != "" && currentSessionID != null) {
