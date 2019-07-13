@@ -5,6 +5,12 @@
  * Last modified 13/07/19 21:50                                               *
  ******************************************************************************/
 
+/******************************************************************************
+ * Copyright (c) 2019.                                                        *
+ * Developed by Adam Hodgkinson                                               *
+ * Last modified 13/07/19 21:50                                               *
+ ******************************************************************************/
+
 let currentSessionID = getCookie("currentSessionID");
 if (currentSessionID == "") {
     window.location.href = "../";
@@ -18,7 +24,7 @@ socket.on('message', function (data) {
 socket.on('get username', function (data) {
     currentUsername = data;
     setCookie("currentUsername", currentUsername, 0.2);
-})
+});
 
 socket.on('connect user to game', function (gameId) {
     window.location.href = "/game?gameId=" + gameId;
