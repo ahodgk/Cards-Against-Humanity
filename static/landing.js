@@ -1,8 +1,7 @@
-
-/******************************************************************************
- * Copyright (c) 2019.                                                        *
- * Developed by Adam Hodgkinson                                               *
- * Last modified 13/07/19 21:50                                               *
+/*******************************************************************************
+ * Copyright (c) 2019.
+ * Developed by Adam Hodgkinson
+ * Last modified 13/07/19 22:24
  ******************************************************************************/
 
 let currentSessionID = getCookie("currentSessionID");
