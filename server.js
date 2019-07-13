@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright (c) 2019.
  * Developed by Adam Hodgkinson
- * Last modified 13/07/19 23:08
+ * Last modified 13/07/19 23:21
  ******************************************************************************/
 
 
@@ -283,7 +283,7 @@ function nextGameState(gameId) { // TODO add a timer for each state
 
         // remove players at a safe time
         for (let i = 0; i < game.removeQueue.length; i++) {
-            switch (method.toUpperCase()) {
+            switch (game.removeQueue[i].method.toUpperCase()) {
                 case "LOG OUT":
                     //logOutUser(game.removeQueue[i].session, connectedSessions[game.removeQueue[i].session].socketID);
 
@@ -331,7 +331,7 @@ function nextGameState(gameId) { // TODO add a timer for each state
 
 
         game.roundTimerStart = Date.now();
-        game.roundTimer = setInterval(function(){
+        game.roundTimer = setInterval(function () {
             // todo allow state to progress without error
             // todo add player visisble logs
             // this should just move on an play with whoever has allready played
@@ -350,7 +350,7 @@ function nextGameState(gameId) { // TODO add a timer for each state
 
         for (let i = 0; i < game.players.length; i++) { // for each player
             if (i == game.playStateInfo.czarIndex) continue; // if they are czar
-            if(game.players[i].playedCards.length != game.playStateInfo.cardsToChoose) continue; // skips adding them to top cards as they have not finished - they will lose their cards
+            if (game.players[i].playedCards.length != game.playStateInfo.cardsToChoose) continue; // skips adding them to top cards as they have not finished - they will lose their cards
             object.push({cards: game.players[i].playedCards, playerIndex: i}) // adds an object containing: 1) a list of their cards 2) their player index
         }
         shuffle(object); // so order is unknown, only happens on state change
@@ -359,7 +359,7 @@ function nextGameState(gameId) { // TODO add a timer for each state
 
 
         game.roundTimerStart = Date.now();
-        game.roundTimer = setInterval(function(){
+        game.roundTimer = setInterval(function () {
             // todo allow state to progress without error
             // todo add player visisble logs
             // this should just skip the round - nobody gets points
@@ -469,6 +469,14 @@ function userConnected(data) {
             playedCards: []
         });
     }
+
+    if (exists) {
+        for (let i = 0; i < gamesInProgress[data.gameId].removeQueue.length; i++) {
+            if (gamesInProgress[data.gameId].removeQueue[i].session == data.session) {
+                gamesInProgress[data.gameId].removeQueue.splice(i, 1);
+            }
+        }
+    }
     if (game.playState != 0) {
         dealCards(data.gameId)
     }
@@ -576,7 +584,7 @@ function removePlayerFromGame(gameId, session) {
 
 function addPlayerToRemoveQueue(gameId, session, method) {
     console.log("Add player to remove queue SESSION: " + session + " GAME: " + gameId + " METHOD: " + method);
-    if(gamesInProgress[gameId] == null) return false;
+    if (gamesInProgress[gameId] == null) return false;
     gamesInProgress[gameId].removeQueue.push({session: session, gameId: gameId, method: method});
 }
 
