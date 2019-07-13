@@ -2,6 +2,12 @@
 /******************************************************************************
  * Copyright (c) 2019.                                                        *
  * Developed by Adam Hodgkinson                                               *
+ * Last modified 13/07/19 22:20                                               *
+ ******************************************************************************/
+
+/******************************************************************************
+ * Copyright (c) 2019.                                                        *
+ * Developed by Adam Hodgkinson                                               *
  * Last modified 13/07/19 21:50                                               *
  ******************************************************************************/
 
@@ -453,7 +459,7 @@ function userConnected(data) {
     // io.sockets.connected[connectedSessions[gamesInProgress[gameId].players[i].sessionID].socketID].emit('receive cards', gamesInProgress[gameId].players[i].cards);
 
     //if()
-    if (connectedSessions[data.session].currentGame != data.gameId) {
+    if (connectedSessions[data.session].currentGame != data.gameId && data.gameId != null) {
         addPlayerToRemoveQueue(connectedSessions[data.session].currentGame, data.session, "REMOVE");
         //removePlayerFromGame(connectedSessions[data.session].currentGame, data.session);
     }
@@ -509,7 +515,8 @@ function getFullGameState(gameId) { // TODO split this into several function for
         playStateInfo: playStateInfo,
         round: game.round,
         pointsGoal: game.pointsGoal,
-        playState: game.playState
+        playState: game.playState,
+        roundTimerStart: game.roundTimerStart
     };
     // extras
     /*   if (game.playState == 2) {
@@ -575,6 +582,7 @@ function removePlayerFromGame(gameId, session) {
 
 function addPlayerToRemoveQueue(gameId, session, method) {
     console.log("Add player to remove queue SESSION: " + session + " GAME: " + gameId + " METHOD: " + method);
+    if(gamesInProgress[gameId] == null) return false;
     gamesInProgress[gameId].removeQueue.push({session: session, gameId: gameId, method: method});
 }
 
