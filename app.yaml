@@ -2,6 +2,6 @@ service: default
 runtime: nodejs10
 basic_scaling:
   max_instances: 1
-  min_instances: 0
   idle_timeout: 10m
 threadsafe: true
+version: $TRAVIS_BUILD_NUMBER
