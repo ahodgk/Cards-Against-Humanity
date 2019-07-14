@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright (c) 2019.
  * Developed by Adam Hodgkinson
- * Last modified 13/07/19 23:21
+ * Last modified 14/07/19 12:37
  ******************************************************************************/
 
 
@@ -478,7 +478,7 @@ function userConnected(data) {
         }
     }
     if (game.playState != 0) {
-        dealCards(data.gameId)
+        dealCards(data.gameId);
     }
 
     sendGamePlayersFullState(data.gameId);
