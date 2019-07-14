@@ -4,7 +4,7 @@ node_js:
 before_install:
 - openssl aes-256-cbc -K $encrypted_8e3b26a69229_key -iv $encrypted_8e3b26a69229_iv
   -in client-secret.json.enc -out client-secret.json -d
-- echo "version : $TRAVIS_BUILD_NUMBER" >> app.yaml
+- echo "version : $TRAVIS_BUILD_NUMBER" >> app.yaml"
 deploy:
   provider: gae
   keyfile: client-secret.json
