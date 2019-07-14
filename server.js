@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright (c) 2019.
  * Developed by Adam Hodgkinson
- * Last modified 14/07/19 12:37
+ * Last modified 14/07/19 12:42
  ******************************************************************************/
 
 
@@ -506,7 +506,7 @@ function getFullGameState(gameId) { // TODO split this into several function for
         czarIndex: game.playStateInfo.czarIndex,
         topCards: game.playStateInfo.topCards,
         blackCard: game.playStateInfo.blackCard
-    }
+    };
 
     let returnObject = {
         gameName: game.gameName,
