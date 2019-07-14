@@ -9,5 +9,7 @@ deploy:
   keyfile: client-secret.json
   project: cah-test-236920
   skip_cleanup: true
-  version: "v" + $TRAVIS_BUILD_NUMBER
+  version:
+    - "v"
+    - $TRAVIS_BUILD_NUMBER
 
