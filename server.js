@@ -157,7 +157,7 @@ function chooseCard(data) {
     }
     // doing shit
     let card = game.players[indexOfPlayer].cards[data.cardIndex];
-    consoleLog("INFO", "Player played card " + card.cardText)
+    // consoleLog("INFO", "Player played card " + card.cardText)
     game.players[indexOfPlayer].playedCards.push(card); // adds to their list of played cards
 
     game.players[indexOfPlayer].cards.splice(data.cardIndex, 1); // removes from their deck
