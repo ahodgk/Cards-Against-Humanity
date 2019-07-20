@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright (c) 2019.
  * Developed by Adam Hodgkinson
- * Last modified 14/07/19 12:42
+ * Last modified 20/07/19 13:42
  ******************************************************************************/
 
 
@@ -21,7 +21,6 @@ var http = require('http');
 var path = require('path');
 var socketIO = require('socket.io');
 const request = require('request');
-var redis = require('redis');
 
 var app = express();
 var server = http.Server(app);
@@ -32,15 +31,6 @@ const PORT = process.env.PORT || 5000;
 app.set('port', PORT);
 app.use('/static', express.static(__dirname + '/static'));
 app.use('/game', express.static(__dirname + '/game'));
-
-var redisStore = redis.createClient(6379, "10.0.0.3");
-
-redisStore.on('connect', function(){
-    consoleLog("INFO", "REDIS CONNECTED");
-});
-redisStore.on('error', function(){
-    consoleLog("ERROR", "FAILED TO CONNECT TO REDIS");
-});
 
 function getWhiteCardsJSON() {
     let obj = null;
