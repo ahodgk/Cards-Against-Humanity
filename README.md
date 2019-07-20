@@ -10,4 +10,4 @@ more about Node.js - it is fully deployed and playable
 Please report any bugs on the [issues](https://github.com/noodleWrecker7/Cards-Against-Humanity/issues) tab of the
 Github repo, or any suggestions.
 
-Forks and PRs  are welcome.
+Forks and PRs are welcome.
