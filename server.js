@@ -718,7 +718,8 @@ function logData(message) {
 
 function consoleLog(type, message) {
     try {
-        console.log("<" + type + "> " + message);
+        console.log("<" + type + "> ");
+        console.log(message);
     } catch (e) {
         console.log(e);
     }
