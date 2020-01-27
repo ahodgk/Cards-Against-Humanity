@@ -22,6 +22,23 @@ var path = require('path');
 var socketIO = require('socket.io');
 const request = require('request');
 
+var firebase = require("firebase/app");
+require("firebase/auth");
+require("firebase/database");
+var firebaseConfig = {
+    apiKey: "api-key",
+    authDomain: "project-id.firebaseapp.com",
+    databaseURL: "https://project-id.firebaseio.com",
+    projectId: "project-id",
+    storageBucket: "project-id.appspot.com",
+    messagingSenderId: "sender-id",
+    appId: "app-id",
+    measurementId: "G-measurement-id",
+};
+firebase.initializeApp(firebaseConfig);
+
+
+
 var app = express();
 var server = http.Server(app);
 var io = socketIO(server);
@@ -30,7 +47,7 @@ const PORT = process.env.PORT || 5000;
 
 app.set('port', PORT);
 app.use('/static', express.static(__dirname + '/static'));
-app.use('/game', express.static(__dirname + '/game'));
+//app.use('/game', express.static(__dirname + '/game'));
 
 function getWhiteCardsJSON() {
     let obj = null;

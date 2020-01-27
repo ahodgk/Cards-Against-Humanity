@@ -6,7 +6,7 @@
 
 let currentSessionID = getCookie("currentSessionID");
 if (currentSessionID == "") {
-    window.location.href = "../";
+    //window.location.href = "../";
 }
 
 var socket = io();
