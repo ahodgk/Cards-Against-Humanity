@@ -1,0 +1,50 @@
+<!--
+  ~ Copyright (c) 2020.
+  ~ Developed by Adam Hodgkinson
+  ~ Last modified 27/1/1 20:15
+  ~
+  ~ Everything on this page, and other pages on the website, is subject to the copyright of Adam Hodgkinson, it may be freely used, copied, distributed and/or modified, however, full credit must be given
+  ~ to me and any derived works should be released under the same license. I am not held liable for any claim, this software is provided as-is and without any warranty.
+  ~
+  ~ I do not own any of the following content and is used under their respective licenses:
+  ~     Fontawesome
+  ~     Photonstorm's phaser.js
+  -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cards Against Humanity</title>
+    <link rel="stylesheet" href="css/landing.css">
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="/__/firebase/7.7.0/firebase-app.js"></script>
+    <script src="/__/firebase/7.7.0/firebase-auth.js"></script>
+    <script src="/__/firebase/7.7.0/firebase-database.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+         https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="/__/firebase/7.7.0/firebase-analytics.js"></script>
+
+    <!-- Initialize Firebase -->
+    <script src="/__/firebase/init.js"></script>
+    <script src="landing.js"></script>
+</head>
+<body>
+<div class="main-content">
+    <h1>Cards Against Humanity </h1>
+
+
+    <form class="form" action="javascript:;" onsubmit="connect(this)">
+        <label class="username-input">
+            <input type="text" name="username" placeholder="Username">
+        </label>
+        <input class="submit-button" type="submit" value="Confirm">
+    </form>
+
+</div>
+
+
+</body>
+</html>

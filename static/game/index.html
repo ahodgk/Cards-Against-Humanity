@@ -1,0 +1,79 @@
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (c) 2019.
+  ~ Developed by Adam Hodgkinson
+  ~ Last modified 20/07/19 13:48
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="/__/firebase/7.7.0/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+         https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="/__/firebase/7.7.0/firebase-analytics.js"></script>
+
+    <!-- Initialize Firebase -->
+    <script src="/__/firebase/init.js"></script>
+    <script src="client.js"></script>
+    <link rel="stylesheet" href="game.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+          integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+</head>
+<body id="body">
+
+<div class="main-page">
+    <nav class="top-bar" id="top-bar">
+        <button class="top-buttons" onclick="leaveGame();">Leave</button>
+        <!--<button class="top-buttons" onclick="">Start Game</button>-->
+
+        <div class="push-right"></div>
+        <p class="right-button time-left" id="round-timer">Time Left: 60s</p>
+        <!--<button class="top-buttons" onclick="showGameConfig();">Game Config</button>-->
+        <button class="top-buttons right-button" onclick="logOut()">Log out</button>
+    </nav>
+    <div class="main-content">
+        <div class="main-game">
+            <div class="top-section">
+                <div class="black-card-section">
+                    <div class="black-card"><p class="black-card-text" id="black-card-text"></p></div>
+                    <button onclick="confirmCardChoice()" class="confirm-card-choice">Confirm Selection</button>
+                </div>
+                <div class="other-player-cards-section" id="top-other-player-cards-container">
+
+
+
+                </div>
+            </div>
+            <div class="bottom-section">
+                <div class="player-list">
+                    <h4 class="players-title">Players:</h4>
+                    <div class="list-players" id="list-of-players">
+                        <div class="player-list-item"><p class="player-list-name">Player</p>
+                            <p class="player-list-points">0</p></div>
+                    </div>
+                </div>
+                <div class="bottom-card-container">
+                    <div id="czar-notice" class="czar-notice">
+                        <div class="czar-notice-box"><p>YOU ARE CARD CZAR</p></div>
+                    </div>
+                    <h4 class="bottom-card-container-title">Your Cards:</h4>
+                    <div id="cards-container" class="cards-container">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chat-box" id="chat-box">
+            <!--<p class="chat-message">[12:13:37] This is a test message</p>
+            <p class="chat-message">[12:13:37] This is another test message</p>
+            <p class="chat-message">[15:32:56] At a different time this message is</p>-->
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
