@@ -1,0 +1,42 @@
+{
+  "CARDSGAMESERVERDATA": {
+    "connectedSessions": {
+      "SIDxxxxxxxxxxx1": {
+        "sessionID": "xxxxxxxx",
+        "displayName": "John",
+        "currentGameID": null
+      },
+      "SIDxxxxxxxxxxx2": {
+        "sessionID": "xxxxxxxx",
+        "displayName": "Adam",
+        "currentGameID": "GID69"
+      }
+    },
+    "gamesInProgress": {
+      "GID69": {
+        "gameName": "Game",
+        "creatorSessionID": "xxxxxxxx",
+        "gameId": "GID69",
+        "players": [
+          {
+            "sessionID": "xxxxxxxx",
+            "points": 0,
+            "isCreator": true,
+            "hasPlayed": false,
+            "isCzar": false
+          }
+        ],
+        "status": 0,
+        "round": 0,
+        "pointsGoal": 12,
+        "gamePlayState": 0,
+        "playStateInfo": {
+          "czarIndex": -1
+        },
+        "playerRemoveQueue": [],
+        "roundTimer": null,
+        "roundTimerStart": 0
+      }
+    }
+  }
+}

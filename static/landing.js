@@ -1,13 +1,39 @@
-/*******************************************************************************
- * Copyright (c) 2019.
+/*
+ * Copyright (c) 2020.
  * Developed by Adam Hodgkinson
- * Last modified 13/07/19 22:24
- ******************************************************************************/
+ * Last modified 28/1/1 22:1
+ *
+ * Everything on this page, and other pages on the website, is subject to the copyright of Adam Hodgkinson, it may be freely used, copied, distributed and/or modified, however, full credit must be given
+ * to me and any derived works should be released under the same license. I am not held liable for any claim, this software is provided as-is and without any warranty.
+ *
+ * I do not own any of the following content and is used under their respective licenses:
+ *     Fontawesome
+ *     Photonstorm's phaser.js
+ */
 var USER;
 var APIURI = "http://192.168.1.2:3000";
 let currentSessionID = getCookie("currentSessionID");
 if (currentSessionID != "" && currentSessionID != null) {
     window.location.href = "/serverlist.html";
+}
+
+window.onload = function(){
+    //console.log(firebase.auth().currentUser);
+    firebase.auth().onAuthStateChanged(function (user) {
+        if (user) {
+            // User is signed in.
+            var isAnonymous = user.isAnonymous;
+            request("POST", "/players", {username:name}/*"username=" + name*/).then(function (data) {
+                console.log(data);
+                setCookie("userID", user.uid, 0.2)
+                setCookie("currentUsername", data.username, 0.2);
+
+            });
+        } else {
+            // User is signed out.
+            console.log("Signed out")
+        }
+    });
 }
 
 var socket = io();
@@ -33,27 +59,35 @@ function connect(form) {
         var errorMessage = error.message;
     });
 
-    firebase.auth().onAuthStateChanged(function (user) {
-        if (user) {
-            // User is signed in.
-            var isAnonymous = user.isAnonymous;
-            var uid = user.uid;
-            console.log(uid);
-            USER = user;
-            let req = new XMLHttpRequest();
-            req.open("POST", APIURI + "/newPlayer");
-            req.setRequestHeader("Content-Type", "text/html");
-            req.send(name);
-        } else {
-            // User is signed out.
-            console.log("Signed out")
-        }
-    });
 
-    console.log(name);
-    setCookie("currentUsername", name, 0.2);
+
 
     //window.location.href = "/static/serverlist.html";
+}
+
+async function request(method, endpoint, body) {
+    return new Promise(function (resolve, reject) {
+        let req = new XMLHttpRequest();
+        req.open(method, APIURI + endpoint);
+        req.setRequestHeader("Content-Type", "application/json");
+        req.send(body);
+        req.onload = function () {
+            if (this.status >= 200 && this.status < 300) {
+                resolve(this.response);
+            } else {
+                reject({
+                    status: this.status,
+                    statusText: this.statusText
+                });
+            }
+            this.onerror = function () {
+                reject({
+                    status: this.status,
+                    statusText: this.statusText
+                });
+            };
+        };
+    })
 }
 
 function setCookie(cname, cvalue, exdays) {
