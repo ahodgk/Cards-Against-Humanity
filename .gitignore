@@ -6,3 +6,6 @@ credentials.tar.gz
 client-secret.json
 api_key.py
 lib/
+/database.rules.json
+/firebase-debug.log
+/.firebase/
