@@ -3,13 +3,16 @@
     "connectedSessions": {
       "SIDxxxxxxxxxxx1": {
         "sessionID": "xxxxxxxx",
+        "userID": "xxxxxxxxxxx",
         "displayName": "John",
-        "currentGameID": null
+        "currentGameID": null,
+        "lastSeen": 0
       },
       "SIDxxxxxxxxxxx2": {
         "sessionID": "xxxxxxxx",
         "displayName": "Adam",
-        "currentGameID": "GID69"
+        "currentGameID": "GID69",
+        "lastSeen": 0
       }
     },
     "gamesInProgress": {
