@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2020.
  * Developed by Adam Hodgkinson
- * Last modified 28/1/1 22:1
+ * Last modified 29/1/1 19:59
  *
  * Everything on this page, and other pages on the website, is subject to the copyright of Adam Hodgkinson, it may be freely used, copied, distributed and/or modified, however, full credit must be given
  * to me and any derived works should be released under the same license. I am not held liable for any claim, this software is provided as-is and without any warranty.
@@ -17,13 +17,24 @@ if (currentSessionID != "" && currentSessionID != null) {
     window.location.href = "/serverlist.html";
 }
 
-window.onload = function(){
+window.onload = function () {
     //console.log(firebase.auth().currentUser);
     firebase.auth().onAuthStateChanged(function (user) {
         if (user) {
             // User is signed in.
-            var isAnonymous = user.isAnonymous;
-            request("POST", "/players", {username:name}/*"username=" + name*/).then(function (data) {
+            if(getCookie('sessionID')!='0'){ // if it has one saved
+                // asks if session already exists, only responds anything if the current user has perms
+                request("GET", "/players/"+getCookie('sessionID'), null, [{"userID" : user.uid}]).then(
+                    function (data){
+                    if(data == null) {
+                        setCookie("sessionID", '0', 0.2);
+                    } else {
+                        window.location.href = "/serverlist.html";
+                    }
+                })
+            }
+            //TODO create new player  properly + testing
+            request("POST", "/players", "username=" + {name}).then(function (data) {
                 console.log(data);
                 setCookie("userID", user.uid, 0.2)
                 setCookie("currentUsername", data.username, 0.2);
@@ -60,17 +71,18 @@ function connect(form) {
     });
 
 
-
-
     //window.location.href = "/static/serverlist.html";
 }
 
-async function request(method, endpoint, body) {
+async function request(method, endpoint, body, headers) {
     return new Promise(function (resolve, reject) {
         let req = new XMLHttpRequest();
         req.open(method, APIURI + endpoint);
-        req.setRequestHeader("Content-Type", "application/json");
-        req.send(body);
+        req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        for (let i = 0; i < headers.length; i++) {
+            req.setRequestHeader(header[i].name, header[i].value)
+        }
+        req.send(encodeURI(body));
         req.onload = function () {
             if (this.status >= 200 && this.status < 300) {
                 resolve(this.response);
