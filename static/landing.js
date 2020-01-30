@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2020.
  * Developed by Adam Hodgkinson
- * Last modified 29/1/1 19:59
+ * Last modified 30/1/1 22:50
  *
  * Everything on this page, and other pages on the website, is subject to the copyright of Adam Hodgkinson, it may be freely used, copied, distributed and/or modified, however, full credit must be given
  * to me and any derived works should be released under the same license. I am not held liable for any claim, this software is provided as-is and without any warranty.
@@ -22,24 +22,28 @@ window.onload = function () {
     firebase.auth().onAuthStateChanged(function (user) {
         if (user) {
             // User is signed in.
-            if(getCookie('sessionID')!='0'){ // if it has one saved
+            if (getCookie('sessionID') != '0') { // if it has one saved
                 // asks if session already exists, only responds anything if the current user has perms
-                request("GET", "/players/"+getCookie('sessionID'), null, [{"userID" : user.uid}]).then(
-                    function (data){
-                    if(data == null) {
-                        setCookie("sessionID", '0', 0.2);
-                    } else {
-                        window.location.href = "/serverlist.html";
-                    }
-                })
-            }
-            //TODO create new player  properly + testing
-            request("POST", "/players", "username=" + {name}).then(function (data) {
-                console.log(data);
-                setCookie("userID", user.uid, 0.2)
-                setCookie("currentUsername", data.username, 0.2);
+                request("GET", "/players/" + getCookie('sessionID')).then(
+                    function (data) {
+                        if (data == null) {
+                            setCookie("sessionID", '0', 0.2);
+                        } else {
+                            window.location.href = "/serverlist.html";
+                        }
+                    })
+            } else {
+                if(nameChosen)
+                request("POST", "/players", "username=" + nameChosen).then(function (data) {
+                    console.log(data);
 
-            });
+                    setCookie("userID", user.uid, 0.2);
+                    setCookie("sessionID", data.sessionID);
+                    setCookie("currentUsername", data.username, 0.2);
+                    window.location.href = "/serverlist.html";
+
+                });
+            }
         } else {
             // User is signed out.
             console.log("Signed out")
@@ -47,22 +51,14 @@ window.onload = function () {
     });
 }
 
-var socket = io();
-socket.on('message', function (data) {
-    console.log(data);
-})
 
-socket.on('newSessionID', function (data) {
-    currentSessionID = data;
-    setCookie("currentSessionID", currentSessionID, 0.2);
-    window.location.href = "/serverlist.html";
-})
-
+var nameChosen = null;
 function connect(form) {
     let name = htmlEscape(form.username.value);
     if (name == " " || name == "" || name == null) {
         return;
     }
+    nameChosen = name;
     //socket.emit('new player', name);
     firebase.auth().signInAnonymously().catch(function (error) {
         // Handle Errors here.
@@ -79,6 +75,7 @@ async function request(method, endpoint, body, headers) {
         let req = new XMLHttpRequest();
         req.open(method, APIURI + endpoint);
         req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        req.setRequestHeader("userID", firebase.auth().currentUser.uid);
         for (let i = 0; i < headers.length; i++) {
             req.setRequestHeader(header[i].name, header[i].value)
         }
