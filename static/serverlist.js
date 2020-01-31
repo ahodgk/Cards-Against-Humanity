@@ -1,13 +1,19 @@
-/******************************************************************************
- * Copyright (c) 2019.                                                        *
- * Developed by Adam Hodgkinson                                               *
- * Last modified 13/07/19 21:57                                               *
- ******************************************************************************/
+/*
+ * Copyright (c) 2020.
+ * Developed by Adam Hodgkinson
+ * Last modified 31/1/1 21:25
+ *
+ * Everything on this page, and other pages on the website, is subject to the copyright of Adam Hodgkinson, it may be freely used, copied, distributed and/or modified, however, full credit must be given
+ * to me and any derived works should be released under the same license. I am not held liable for any claim, this software is provided as-is and without any warranty.
+ *
+ * I do not own any of the following content and is used under their respective licenses:
+ *     Fontawesome
+ *     Photonstorm's phaser.js
+ */
 
 let currentSessionID = getCookie("currentSessionID");
-if (currentSessionID == "") {
-    //window.location.href = "../";
-}
+let currentUsername = getCookie("currentUsername");
+
 
 var socket = io();
 socket.on('message', function (data) {
@@ -54,13 +60,32 @@ socket.on('receive game list', function (data) {
 });
 
 
-let currentUsername;
-
 window.onload = function () {
     if (currentSessionID == "" || currentSessionID == null) {
         window.location.href = "../";
         return;
     }
+
+    firebase.auth().onAuthStateChanged(function (user) {
+        if (user) {
+            // User is signed in.
+
+            firebase.database().ref("CARDSGAMESERVERDATA/connectedSessions/" + currentSessionID).once('value').then(function (snapshot) {
+                if (snapshot.val().currentGameID != null) {
+                    window.location.href = "game?gameId=" + snapshot.val().currentGameID;
+                }
+            }).catch(function (error) {
+                console.log(error)
+                window.location.href = "../";
+            })
+
+        } else {
+            // User is signed out.
+            console.log("Signed out")
+        }
+    });
+
+
     socket.emit('return player', currentSessionID);
     setCookie("currentSessionID", currentSessionID, 0.2);
     refreshGameList();
