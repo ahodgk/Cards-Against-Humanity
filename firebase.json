@@ -8,7 +8,11 @@
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "API",
+      "README.md",
+      "LICENSE",
+      ".github"
     ]
   }
 }

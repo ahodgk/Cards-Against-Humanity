@@ -20,6 +20,7 @@
         "gameName": "Game",
         "creatorSessionID": "xxxxxxxx",
         "gameId": "GID69",
+        "public": true,
         "players": [
           {
             "sessionID": "xxxxxxxx",
