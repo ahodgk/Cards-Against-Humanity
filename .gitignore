@@ -9,3 +9,5 @@ lib/
 /database.rules.json
 /firebase-debug.log
 /.firebase/
+firebaseConfig.json
+login.json
