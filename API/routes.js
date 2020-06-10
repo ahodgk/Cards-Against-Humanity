@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2020.
  * Developed by Adam Hodgkinson
- * Last modified 14/3/3 20:27
+ * Last modified 10/6/6 22:25
  *
  * Everything on this page, and other pages on the website, is subject to the copyright of Adam Hodgkinson, it may be freely used, copied, distributed and/or modified, however, full credit must be given
  * to me and any derived works should be released under the same license. I am not held liable for any claim, this software is provided as-is and without any warranty.
@@ -22,6 +22,7 @@ module.exports = function (app) {
     console.log("Cards initialised");
 
 
+    // post the body as the username, creates new player object
     app.post('/players', (req, res) => { /* it doesnt actually delete old sessions, a user could have many sessions
     with the same anonymous account, but they should be purged after a long inactivity */
         let SID = createSessionID();
@@ -39,6 +40,7 @@ module.exports = function (app) {
 
     var SIDLength = 10;
 
+    // for making new session ids
     function createSessionID() {
         let validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789"; //-*&^@£!
         let val = null;
@@ -53,6 +55,7 @@ module.exports = function (app) {
         }
     } // returns id as string
 
+    // checks session doesnt exist
     function checkSessionFree(session) {
         return new Promise(function (resolve, reject) {
             firebase.database().ref('/CARDSGAMESERVERDATA/connectedSessions/' + session).once('value').then(function (snapshot) {
@@ -66,6 +69,7 @@ module.exports = function (app) {
         })
     } // returns true if no session is in use with ID
 
+    // get data about a session, only if the request comes from that player
     app.get('/players/:sessionID', (req, res) => { // auth
         firebase.database().ref('/CARDSGAMESERVERDATA/connectedSessions/' + req.params.sessionID).once('value').then(function (snapshot) {
             let result = snapshot.val();
