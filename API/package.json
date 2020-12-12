@@ -1,0 +1,17 @@
+{
+  "name": "cardsapi",
+  "version": "1.0.0",
+  "description": "the api for cards against humanity",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "firebase": "^7.9.0"
+  }
+}
