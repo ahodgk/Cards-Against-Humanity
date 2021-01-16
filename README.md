@@ -1,5 +1,7 @@
 # Cards Against Humanity
 
+`This project is no longer actually being maintained and was in the middle of a full rewrite when I left it so basically nothing works`
+
 ### What's this repo about?
 This started as just a small side projects to learn
 more about Node.js - it is fully deployed and playable
